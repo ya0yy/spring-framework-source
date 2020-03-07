@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group 'org.springframework'
+version '5.2.0.BUILD-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+//processResources {
+//    from('src/main/resources') {
+//        include '**'
+//    }
+//}
+//
+//task copyTestResources(type: Copy) {
+//    from "${projectDir}/src/main/resources"
+//    into "${buildDir}/classes"
+//}
+//processTestResources.dependsOn copyTestResources
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile group: 'cglib', name: 'cglib-nodep', version: '2.2'
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.5'
+
+//    compile (project(":spring-context"))
+
+    compile (project(":spring-webmvc"))
+//    compile (project(":spring-context-support"))
+//    compile (project(":spring-jdbc"))
+
+//    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: '8.5.28'
+    compile ("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}")
+    compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-logging-juli', version: '8.5.0'
+
+}

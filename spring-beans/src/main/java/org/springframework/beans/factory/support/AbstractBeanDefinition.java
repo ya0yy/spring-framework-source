@@ -175,6 +175,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	private String factoryMethodName;
 
 	@Nullable
+	// <constructor-arg value = "xxx" />
 	private ConstructorArgumentValues constructorArgumentValues;
 
 	@Nullable

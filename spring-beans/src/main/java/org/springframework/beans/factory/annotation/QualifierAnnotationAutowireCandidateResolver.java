@@ -144,13 +144,17 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 */
 	@Override
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 父类中判断了autowireCandidate，该字段只能在xml中配置或在BeanFactory后置处理器中拿到bd更改
 		boolean match = super.isAutowireCandidate(bdHolder, descriptor);
 		if (match) {
+			// 检查@Qualifier
 			match = checkQualifiers(bdHolder, descriptor.getAnnotations());
 			if (match) {
+				// 如果是方法
 				MethodParameter methodParam = descriptor.getMethodParameter();
 				if (methodParam != null) {
 					Method method = methodParam.getMethod();
+					// 这里搞不懂为什么如果是void方法，为什么又要检查一遍方法参数的@Qualifer
 					if (method == null || void.class == method.getReturnType()) {
 						match = checkQualifiers(bdHolder, methodParam.getMethodAnnotations());
 					}
@@ -162,8 +166,10 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 
 	/**
 	 * Match the given qualifier annotations against the candidate bean definition.
+	 * 此方法检查的Qualifier注解包含spring的和javax的
 	 */
 	protected boolean checkQualifiers(BeanDefinitionHolder bdHolder, Annotation[] annotationsToSearch) {
+		// 如果该描述符中没有注解，则直接通过qualifier检查，一般最起码包含一个@Autowired
 		if (ObjectUtils.isEmpty(annotationsToSearch)) {
 			return true;
 		}
@@ -172,6 +178,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 			Class<? extends Annotation> type = annotation.annotationType();
 			boolean checkMeta = true;
 			boolean fallbackToMeta = false;
+			// 自己是否是@Qualifier，或者自己是否直接继承了@带Qualifier（就是该注解上是否被@Qualifier注解了）
 			if (isQualifier(type)) {
 				if (!checkQualifier(bdHolder, annotation, typeConverter)) {
 					fallbackToMeta = true;
@@ -180,8 +187,10 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 					checkMeta = false;
 				}
 			}
+			// 查找直接父注解，注意并不包含父注解的父注解，只有一层层级关系的才会被找出来。在@Qualifier的Java Doc中已经说明了，该注解加载其他自定义注解上，自定义注解就有了限定Bean的作用
 			if (checkMeta) {
 				boolean foundMeta = false;
+				// 遍历直接父注解
 				for (Annotation metaAnn : type.getAnnotations()) {
 					Class<? extends Annotation> metaType = metaAnn.annotationType();
 					if (isQualifier(metaType)) {
@@ -220,20 +229,27 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	protected boolean checkQualifier(
 			BeanDefinitionHolder bdHolder, Annotation annotation, TypeConverter typeConverter) {
 
+		// 获取注解类型
 		Class<? extends Annotation> type = annotation.annotationType();
+		// 获取bd
 		RootBeanDefinition bd = (RootBeanDefinition) bdHolder.getBeanDefinition();
 
+		// 通过全限定注解名获取AutowireCandidateQualifier
 		AutowireCandidateQualifier qualifier = bd.getQualifier(type.getName());
+		// 如果获取不到就通过simpleName获取一次
 		if (qualifier == null) {
 			qualifier = bd.getQualifier(ClassUtils.getShortName(type));
 		}
+		// 如果还获取不到
 		if (qualifier == null) {
 			// First, check annotation on qualified element, if any
 			Annotation targetAnnotation = getQualifiedElementAnnotation(bd, type);
 			// Then, check annotation on factory method, if applicable
+			// 查找工厂方法上的这个注解，如果没有则是null
 			if (targetAnnotation == null) {
 				targetAnnotation = getFactoryMethodAnnotation(bd, type);
 			}
+			// 如果还没有就从decoratedDefinition中获取一次
 			if (targetAnnotation == null) {
 				RootBeanDefinition dbd = getResolvedDecoratedDefinition(bd);
 				if (dbd != null) {
@@ -253,6 +269,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 						// Not the usual case - simply forget about the type check...
 					}
 				}
+				// 如果bd有beanClass则从class上获取一次该注解
 				if (targetAnnotation == null && bd.hasBeanClass()) {
 					targetAnnotation = AnnotationUtils.getAnnotation(ClassUtils.getUserClass(bd.getBeanClass()), type);
 				}
@@ -262,6 +279,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 			}
 		}
 
+		// 获取注解上的属性
 		Map<String, Object> attributes = AnnotationUtils.getAnnotationAttributes(annotation);
 		if (attributes.isEmpty() && qualifier == null) {
 			// If no attributes, the qualifier must be present
@@ -280,6 +298,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 				actualValue = bd.getAttribute(attributeName);
 			}
 			if (actualValue == null && attributeName.equals(AutowireCandidateQualifier.VALUE_KEY) &&
+					// 这里会判断value的值是否是bd的名称
 					expectedValue instanceof String && bdHolder.matchesName((String) expectedValue)) {
 				// Fall back on bean name (or alias) match
 				continue;
@@ -329,6 +348,7 @@ public class QualifierAnnotationAutowireCandidateResolver extends GenericTypeAwa
 	 * Determine whether the given dependency declares a qualifier annotation.
 	 * @see #isQualifier(Class)
 	 * @see Qualifier
+	 * 是否包含@Qualifier注解
 	 */
 	@Override
 	public boolean hasQualifier(DependencyDescriptor descriptor) {

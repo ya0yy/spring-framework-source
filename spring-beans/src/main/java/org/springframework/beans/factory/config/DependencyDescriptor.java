@@ -70,6 +70,7 @@ public class DependencyDescriptor extends InjectionPoint implements Serializable
 
 	private final boolean eager;
 
+	// 嵌套层，针对于Optional<T>
 	private int nestingLevel = 1;
 
 	@Nullable

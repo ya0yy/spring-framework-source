@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.instrument.InstrumentationSavingAgent;
+import org.springframework.instrument.*;
 import org.springframework.instrument.classloading.InstrumentationLoadTimeWeaver;
 import org.springframework.instrument.classloading.LoadTimeWeaver;
 import org.springframework.instrument.classloading.ReflectiveLoadTimeWeaver;
@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  * <p>This class implements a runtime environment check for obtaining the
  * appropriate weaver implementation. As of Spring Framework 5.0, it detects
  * Oracle WebLogic 10+, GlassFish 4+, Tomcat 8+, WildFly 8+, IBM WebSphere 8.5+,
- * {@link InstrumentationSavingAgent Spring's VM agent}, and any {@link ClassLoader}
+ * {@link InstrumentationSavingAgent1 Spring's VM agent}, and any {@link ClassLoader}
  * supported by Spring's {@link ReflectiveLoadTimeWeaver} (such as Liberty's).
  *
  * @author Juergen Hoeller

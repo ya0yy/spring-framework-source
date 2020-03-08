@@ -80,6 +80,8 @@ abstract class ConfigurationClassUtils {
 	 * @param beanDef the bean definition to check
 	 * @param metadataReaderFactory the current factory in use by the caller
 	 * @return whether the candidate qualifies as (any kind of) configuration class
+	 * 是否是配置类，判断条件大致是：不是接口并且带有@Component @ComponentScan @Import @ImportResource中的一个或有@Bean方法 即可视为配置类（其实一般如果没有这几种注解也不会走到这里面的代码来）
+	 * 注意full和lite
 	 */
 	public static boolean checkConfigurationClassCandidate(
 			BeanDefinition beanDef, MetadataReaderFactory metadataReaderFactory) {
@@ -90,15 +92,19 @@ abstract class ConfigurationClassUtils {
 		}
 
 		AnnotationMetadata metadata;
+		// 通过AnnotationConfigApplicationContext的register方法注册的类肯定属于AnnotatedBeanDefinition，这里与空参构造器的new的那个reader关联，reader将一个class注册为AnnotatedGenericBeanDefinition
+		// beanDef是否属于AnnotatedBeanDefinition
 		if (beanDef instanceof AnnotatedBeanDefinition &&
 				className.equals(((AnnotatedBeanDefinition) beanDef).getMetadata().getClassName())) {
 			// Can reuse the pre-parsed metadata from the given BeanDefinition...
 			metadata = ((AnnotatedBeanDefinition) beanDef).getMetadata();
 		}
+		// 一般spring自带的所有的bd都是AbstractBeanDefinition的派生类，如果不满足上面的条件，则一定满足此else if
 		else if (beanDef instanceof AbstractBeanDefinition && ((AbstractBeanDefinition) beanDef).hasBeanClass()) {
 			// Check already loaded Class if present...
 			// since we possibly can't even load the class file for this Class.
 			Class<?> beanClass = ((AbstractBeanDefinition) beanDef).getBeanClass();
+			// 以下这些类型不能作为配置类
 			if (BeanFactoryPostProcessor.class.isAssignableFrom(beanClass) ||
 					BeanPostProcessor.class.isAssignableFrom(beanClass) ||
 					AopInfrastructureBean.class.isAssignableFrom(beanClass) ||
@@ -121,10 +127,13 @@ abstract class ConfigurationClassUtils {
 			}
 		}
 
+		// 获取该类的@Configuration注解信息，如果没有被@Configuration标注则为null
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 如果注解的proxyBeanMethods属性不为false，就设置属性CONFIGURATION_CLASS_ATTRIBUTE为full，相当于就是一个full配置类
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// 如果带有@Configuration注解或者该类不是接口并且带有@Component @ComponentScan @Import @ImportResource中的一个或有@Bean方法 就设置为lite配置类
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
@@ -133,6 +142,7 @@ abstract class ConfigurationClassUtils {
 		}
 
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
+		// 如果有实现Order接口则记录Order值
 		Integer order = getOrder(metadata);
 		if (order != null) {
 			beanDef.setAttribute(ORDER_ATTRIBUTE, order);
@@ -147,6 +157,7 @@ abstract class ConfigurationClassUtils {
 	 * @param metadata the metadata of the annotated class
 	 * @return {@code true} if the given class is to be registered for
 	 * configuration class processing; {@code false} otherwise
+	 * 带有@Component @ComponentScan @Import @ImportResource中的一个或有@Bean方法
 	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
 		// Do not consider an interface or an annotation...

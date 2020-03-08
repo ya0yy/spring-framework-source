@@ -774,6 +774,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 		checkRequest(request);
 
 		// Execute invokeHandlerMethod in synchronized block if required.
+		// 是否根据session互斥
 		if (this.synchronizeOnSession) {
 			HttpSession session = request.getSession(false);
 			if (session != null) {
@@ -784,6 +785,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 			}
 			else {
 				// No HttpSession available -> no mutex necessary
+				// 没有session的时候不需要互斥
 				mav = invokeHandlerMethod(request, response, handlerMethod);
 			}
 		}
@@ -844,16 +846,22 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	protected ModelAndView invokeHandlerMethod(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception {
 
+		// request和response封装到ServletWebRequest
 		ServletWebRequest webRequest = new ServletWebRequest(request, response);
 		try {
+			// @InitBinder方法
 			WebDataBinderFactory binderFactory = getDataBinderFactory(handlerMethod);
+			// @ModelAttribute方法
 			ModelFactory modelFactory = getModelFactory(handlerMethod, binderFactory);
 
+			// 通过handlerMethod创建一个ServletInvocableHandlerMethod，最后执行handler的就是它，ServletInvocableHandlerMethod其实是HandlerMethod的子类
 			ServletInvocableHandlerMethod invocableMethod = createInvocableHandlerMethod(handlerMethod);
 			if (this.argumentResolvers != null) {
+				// 添加HandlerMethodArgumentResolver参数解析器
 				invocableMethod.setHandlerMethodArgumentResolvers(this.argumentResolvers);
 			}
 			if (this.returnValueHandlers != null) {
+				// 添加HandlerMethodReturnValueHandler返回值处理器
 				invocableMethod.setHandlerMethodReturnValueHandlers(this.returnValueHandlers);
 			}
 			invocableMethod.setDataBinderFactory(binderFactory);
@@ -942,9 +950,12 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 	private WebDataBinderFactory getDataBinderFactory(HandlerMethod handlerMethod) throws Exception {
+		// bean类型
 		Class<?> handlerType = handlerMethod.getBeanType();
+		// initBinder方法缓存
 		Set<Method> methods = this.initBinderCache.get(handlerType);
 		if (methods == null) {
+			// 找到Controller中所有的@InitBinder的方法
 			methods = MethodIntrospector.selectMethods(handlerType, INIT_BINDER_METHODS);
 			this.initBinderCache.put(handlerType, methods);
 		}

@@ -62,6 +62,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 
 	boolean allowCaching = true;
 
+	// 是否只有一个@Bean工厂方法，注意没有工厂方法的时候也是false
 	boolean isFactoryMethodUnique = false;
 
 	@Nullable
@@ -83,6 +84,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	final Object constructorArgumentLock = new Object();
 
 	/** Package-visible field for caching the resolved constructor or factory method. */
+	// 已经解析过的构造器或工厂方法
 	@Nullable
 	Executable resolvedConstructorOrFactoryMethod;
 
@@ -90,6 +92,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	boolean constructorArgumentsResolved = false;
 
 	/** Package-visible field for caching fully resolved constructor arguments. */
+	// 解析过的构造器参数
 	@Nullable
 	Object[] resolvedConstructorArguments;
 
@@ -107,6 +110,7 @@ public class RootBeanDefinition extends AbstractBeanDefinition {
 	@Nullable
 	volatile Boolean beforeInstantiationResolved;
 
+	// 解析出来的需要注入（@Autowired @Value）的元素，包含方法和字段
 	@Nullable
 	private Set<Member> externallyManagedConfigMembers;
 

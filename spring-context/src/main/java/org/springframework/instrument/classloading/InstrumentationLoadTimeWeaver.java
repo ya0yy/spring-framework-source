@@ -23,7 +23,6 @@ import java.security.ProtectionDomain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.instrument.InstrumentationSavingAgent;
 import org.springframework.lang.Nullable;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
@@ -33,7 +32,7 @@ import org.springframework.util.ClassUtils;
  *
  * <p>Start the JVM specifying the Java agent to be used &mdash; for example, as
  * follows where <code>spring-instrument-{version}.jar</code> is a JAR file
- * containing the {@link InstrumentationSavingAgent} class shipped with Spring
+ * containing the {@link InstrumentationSavingAgen} class shipped with Spring
  * and where <code>{version}</code> is the release version of the Spring
  * Framework (e.g., {@code 5.1.5.RELEASE}).
  *

@@ -69,6 +69,7 @@ public class InjectionMetadata {
 
 	private final Class<?> targetClass;
 
+	// 用于存放解析出来的需要注入（@Autowired @Value）的元素，包含方法和字段
 	private final Collection<InjectedElement> injectedElements;
 
 	@Nullable
@@ -89,6 +90,7 @@ public class InjectionMetadata {
 	}
 
 
+	// 该方法里大致逻辑是将injectedElements中的每个元素都添加进了beanDefinition的externallyManagedConfigMembers和metadata的checkedElements
 	public void checkConfigMembers(RootBeanDefinition beanDefinition) {
 		Set<InjectedElement> checkedElements = new LinkedHashSet<>(this.injectedElements.size());
 		for (InjectedElement element : this.injectedElements) {
@@ -105,10 +107,12 @@ public class InjectionMetadata {
 	}
 
 	public void inject(Object target, @Nullable String beanName, @Nullable PropertyValues pvs) throws Throwable {
+		// 其实checkedElements和injectedElements数据百分之99是一样的
 		Collection<InjectedElement> checkedElements = this.checkedElements;
 		Collection<InjectedElement> elementsToIterate =
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
+			// 遍历每个元素，注入，这里的元素包含方法和字段，都被封装成了InjectedElement类型，字段为AutowiredFieldElement，方法为AutowiredMethodElement
 			for (InjectedElement element : elementsToIterate) {
 				if (logger.isTraceEnabled()) {
 					logger.trace("Processing injected element of bean '" + beanName + "': " + element);

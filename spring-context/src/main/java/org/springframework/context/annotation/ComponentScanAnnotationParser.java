@@ -74,23 +74,30 @@ class ComponentScanAnnotationParser {
 
 
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
+		// 新建扫描器
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,
 				componentScan.getBoolean("useDefaultFilters"), this.environment, this.resourceLoader);
 
+		// 这里获取的是@ComponentScan的nameGenerator属性，默认值是BeanNameGenerator.class
 		Class<? extends BeanNameGenerator> generatorClass = componentScan.getClass("nameGenerator");
+		// 如果是BeanNameGenerator.class就直接使用成员this.beanNameGenerator，否则就根据参数名创建一个（参数名本来就是一个class）
 		boolean useInheritedGenerator = (BeanNameGenerator.class == generatorClass);
 		scanner.setBeanNameGenerator(useInheritedGenerator ? this.beanNameGenerator :
 				BeanUtils.instantiateClass(generatorClass));
 
+		// 获取scopedProxy属性值
 		ScopedProxyMode scopedProxyMode = componentScan.getEnum("scopedProxy");
+		// 如果不等于默认的设置
 		if (scopedProxyMode != ScopedProxyMode.DEFAULT) {
 			scanner.setScopedProxyMode(scopedProxyMode);
 		}
+		// 否则就获取scopeResolver属性值，默认值为AnnotationScopeMetadataResolver.class，并且实例化设置给scanner
 		else {
 			Class<? extends ScopeMetadataResolver> resolverClass = componentScan.getClass("scopeResolver");
 			scanner.setScopeMetadataResolver(BeanUtils.instantiateClass(resolverClass));
 		}
 
+		// resourcePattern默认值为ClassPathScanningCandidateComponentProvider.DEFAULT_RESOURCE_PATTERN，实际上是一个字符串"**/*.class"
 		scanner.setResourcePattern(componentScan.getString("resourcePattern"));
 
 		for (AnnotationAttributes filter : componentScan.getAnnotationArray("includeFilters")) {
@@ -104,31 +111,40 @@ class ComponentScanAnnotationParser {
 			}
 		}
 
+		// bd懒加载默认值。默认为false，也就是平时bean上的@Lazy，这里设为true就是所有扫描到的bean默认懒加载
 		boolean lazyInit = componentScan.getBoolean("lazyInit");
 		if (lazyInit) {
 			scanner.getBeanDefinitionDefaults().setLazyInit(true);
 		}
 
+		// 获取包扫描路径
 		Set<String> basePackages = new LinkedHashSet<>();
 		String[] basePackagesArray = componentScan.getStringArray("basePackages");
 		for (String pkg : basePackagesArray) {
+			// tokenizeToStringArray是用来处理空格、制表符、回车分割的
+			// resolvePlaceholders是解析${}占位符的，从PropertyResource中加载
 			String[] tokenized = StringUtils.tokenizeToStringArray(this.environment.resolvePlaceholders(pkg),
 					ConfigurableApplicationContext.CONFIG_LOCATION_DELIMITERS);
+			// 将解析好的包名存入basePackages
 			Collections.addAll(basePackages, tokenized);
 		}
+		// 添加basePackageClasses中class所在的包
 		for (Class<?> clazz : componentScan.getClassArray("basePackageClasses")) {
 			basePackages.add(ClassUtils.getPackageName(clazz));
 		}
+		// 如果没有指定以上属性，则添加本配置类所在的包
 		if (basePackages.isEmpty()) {
 			basePackages.add(ClassUtils.getPackageName(declaringClass));
 		}
 
+		// 添加排除过滤器，过滤掉本配置类
 		scanner.addExcludeFilter(new AbstractTypeHierarchyTraversingFilter(false, false) {
 			@Override
 			protected boolean matchClassName(String className) {
 				return declaringClass.equals(className);
 			}
 		});
+		// doScan 正式扫描
 		return scanner.doScan(StringUtils.toStringArray(basePackages));
 	}
 

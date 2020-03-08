@@ -127,6 +127,7 @@ abstract class AutowireUtils {
 	 * @param autowiringValue the value to resolve
 	 * @param requiredType the type to assign the result to
 	 * @return the resolved value
+	 * 如果autowiringValue是对象工厂，并且所需类型不是这个工厂，则从工厂中创建对象
 	 */
 	public static Object resolveAutowiringValue(Object autowiringValue, Class<?> requiredType) {
 		if (autowiringValue instanceof ObjectFactory && !requiredType.isInstance(autowiringValue)) {

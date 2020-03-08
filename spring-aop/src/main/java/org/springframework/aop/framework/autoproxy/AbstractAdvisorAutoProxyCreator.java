@@ -73,7 +73,9 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	protected Object[] getAdvicesAndAdvisorsForBean(
 			Class<?> beanClass, String beanName, @Nullable TargetSource targetSource) {
 
+		// 查找符合的通知
 		List<Advisor> advisors = findEligibleAdvisors(beanClass, beanName);
+		// 没有通知就返回null
 		if (advisors.isEmpty()) {
 			return DO_NOT_PROXY;
 		}
@@ -91,8 +93,11 @@ public abstract class AbstractAdvisorAutoProxyCreator extends AbstractAutoProxyC
 	 * @see #extendAdvisors
 	 */
 	protected List<Advisor> findEligibleAdvisors(Class<?> beanClass, String beanName) {
+		// 找出所有通知
 		List<Advisor> candidateAdvisors = findCandidateAdvisors();
+		// 找出符合该bean的通知
 		List<Advisor> eligibleAdvisors = findAdvisorsThatCanApply(candidateAdvisors, beanClass, beanName);
+		// 添加aop的公共方法拦截器
 		extendAdvisors(eligibleAdvisors);
 		if (!eligibleAdvisors.isEmpty()) {
 			eligibleAdvisors = sortAdvisors(eligibleAdvisors);

@@ -1001,6 +1001,7 @@ public class ResolvableType implements Serializable {
 	 * @see #getRawClass()
 	 */
 	public static ResolvableType forRawClass(@Nullable Class<?> clazz) {
+		// 构造方法里存储了clazz的值
 		return new ResolvableType(clazz) {
 			@Override
 			public ResolvableType[] getGenerics() {

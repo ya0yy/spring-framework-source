@@ -58,11 +58,15 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 
 	/**
-	 * Create a new AnnotationConfigApplicationContext that needs to be populated
-	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
+	 * this中有一个DefaultListableBeanFactory，DefaultListableBeanFactory里又一个DeanDefinitionMap，所有的BeanDefinitionMap都在这个map里面
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 在此方法第一行会有一个隐藏的super() 调用父类GenericApplicationContext构造器，里面初始化了beanFactory，
+		// 而ClassPathXmlApplicationContext不会去初始化beanFactory，ClassPathXmlApplicationContext没有继承GenericApplicationContext
+		super(); // 此行源码中没有
+		// 将一个类读取为AnnotatedBeanDefinition，通常是配置入口类，并且将Spring后面要用的5个处理器的BeanDefinition放入到BeanDefinitionFactory中
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		// 包扫描器，但是Spring自己并没有用它
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -84,6 +88,7 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... annotatedClasses) {
 		this();
+		// 将这个类注册为AnnotatedGenericBeanDefinition
 		register(annotatedClasses);
 		refresh();
 	}

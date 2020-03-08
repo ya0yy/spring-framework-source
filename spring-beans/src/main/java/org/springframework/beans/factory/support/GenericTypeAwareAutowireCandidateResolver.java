@@ -62,10 +62,13 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 
 	@Override
 	public boolean isAutowireCandidate(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
+		// 简单检查，就是判断bd里的autowireCandidate字段是否为false，默认为true，可在xml中配置为false或直接更改bd
 		if (!super.isAutowireCandidate(bdHolder, descriptor)) {
 			// If explicitly false, do not proceed with any other checks...
+			// 如果是false就不要进行检查
 			return false;
 		}
+		// 检查范型匹配
 		return checkGenericTypeMatch(bdHolder, descriptor);
 	}
 
@@ -76,6 +79,7 @@ public class GenericTypeAwareAutowireCandidateResolver extends SimpleAutowireCan
 	protected boolean checkGenericTypeMatch(BeanDefinitionHolder bdHolder, DependencyDescriptor descriptor) {
 		ResolvableType dependencyType = descriptor.getResolvableType();
 		if (dependencyType.getType() instanceof Class) {
+			// 如果是一个Class类型就不用范型检查
 			// No generic type -> we know it's a Class type-match, so no need to check again.
 			return true;
 		}

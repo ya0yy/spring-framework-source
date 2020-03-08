@@ -118,6 +118,7 @@ public class PropertyPlaceholderHelper {
 	 * @param value the value containing the placeholders to be replaced
 	 * @param placeholderResolver the {@code PlaceholderResolver} to use for replacement
 	 * @return the supplied value with placeholders replaced inline
+	 * placeholderResolver是外层调用传过来的lambda，{@link org.springframework.core.env.PropertySourcesPropertyResolver#getPropertyAsRawString}
 	 */
 	public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
 		Assert.notNull(value, "'value' must not be null");

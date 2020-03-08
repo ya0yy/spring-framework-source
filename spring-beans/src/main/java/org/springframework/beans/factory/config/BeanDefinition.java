@@ -36,6 +36,9 @@ import org.springframework.lang.Nullable;
  * @see ConfigurableListableBeanFactory#getBeanDefinition
  * @see org.springframework.beans.factory.support.RootBeanDefinition
  * @see org.springframework.beans.factory.support.ChildBeanDefinition
+ *
+ * 在AbstractBeanDefinition中继承了BeanMetadataAttributeAccessor，而这个类实现了AttributeAccessor(属性访问，
+ * 用于存储beanDefinition的额外信息), BeanMetadataElement(元数据，用于获取bean的磁盘路径)两个接口
  */
 public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
@@ -163,6 +166,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * It does not affect explicit references by name, which will get resolved even
 	 * if the specified bean is not marked as an autowire candidate. As a consequence,
 	 * autowiring by name will nevertheless inject a bean if the name matches.
+	 * 在xml中配置，装配候选人，在装配时候，当有多个候选对象时退出候选
 	 */
 	void setAutowireCandidate(boolean autowireCandidate);
 
@@ -216,6 +220,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Return the constructor argument values for this bean.
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the ConstructorArgumentValues object (never {@code null})
+	 * 构造器参数值 map存带索引的，list存不带索引的
 	 */
 	ConstructorArgumentValues getConstructorArgumentValues();
 
@@ -231,6 +236,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 	 * Return the property values to be applied to a new instance of the bean.
 	 * <p>The returned instance can be modified during bean factory post-processing.
 	 * @return the MutablePropertyValues object (never {@code null})
+	 * 属性参数值
 	 */
 	MutablePropertyValues getPropertyValues();
 
@@ -321,6 +327,7 @@ public interface BeanDefinition extends AttributeAccessor, BeanMetadataElement {
 
 	/**
 	 * Return whether this bean is "abstract", that is, not meant to be instantiated.
+	 * 是否抽象，并不是说这个类是抽象类，描述的是这个beaDefinition是否抽象，不参与实例化
 	 */
 	boolean isAbstract();
 

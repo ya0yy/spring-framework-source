@@ -1,4 +1,4 @@
-package com.yao.bean的初始化方法;
+package com.yao.lazy;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -24,12 +24,12 @@ package com.yao.bean的初始化方法;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-09 23:54
+ * 2020-03-09 23:30
  *
  * @author yaoyy
  */
-public class TestMethodBean {
-	public TestMethodBean() {
-		System.out.println("TestMethodBean 构造器");
+public class NormalBean {
+	public NormalBean() {
+		System.out.println("NormalBean构造器");
 	}
 }

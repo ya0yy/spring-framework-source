@@ -59,7 +59,7 @@ final class PostProcessorRegistrationDelegate {
 		// 这是记录执行过的处理器的名称的Set
 		Set<String> processedBeans = new HashSet<>();
 
-		// Spring自导的beanFactory一定属于BeanDefinitionRegistry，只有开发者自己传入一个非BeanDefinitionRegistry的实现才会走else
+		// Spring自带的beanFactory一定属于BeanDefinitionRegistry，只有开发者自己传入一个非BeanDefinitionRegistry的实现才会走else
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();

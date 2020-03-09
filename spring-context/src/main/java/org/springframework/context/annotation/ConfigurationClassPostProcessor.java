@@ -237,6 +237,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 			throw new IllegalStateException(
 					"postProcessBeanFactory already called on this post-processor against " + registry);
 		}
+		// 标记已经调用过本方法，如果再次调用会抛异常
 		this.registriesPostProcessed.add(registryId);
 
 		processConfigBeanDefinitions(registry);
@@ -269,9 +270,18 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	/**
 	 * Build and validate a configuration model based on the registry of
 	 * {@link Configuration} classes.
+	 *
+	 * 1）拿到当前所有bd，循环检查是否是配置类
+	 * 2）如果没有配置类就直接结束，否则接下来会做一些比如排序、环境变量初始化、扫描器初始化等一些操作
+	 * 3）开始扫描
+	 * 4）扫描出来的结果进行验证，验证是否是final static的
+	 * 5）从配置类中把@Bean方法和@Import的类加载为bd，解析之前解析出来的xml配置，也就是被@ImportResource进的配置文件
+	 * 6）最后会循环判断容器中当前存在的bd是否是被parse解析过的，没有被解析的话会去循环执行这个流程，确保容器中所有的bd会被解析到，因为有可能新扫描到一个spring组件，这个组件会往容器中添加另一个新的组件，比如@Import
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+		// 注意这里的registry是上层方法传过来的，其实就是BeanFactory，spring的核心对象
+		// 这里获取到的是当前BeanDefinitionMap中已经存在的所有beanName，也就是spring自带的5加开发者定义的1个入口配置类
 		String[] candidateNames = registry.getBeanDefinitionNames();
 
 		for (String beanName : candidateNames) {
@@ -331,10 +341,12 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
 		do {
-			// 解析所有配置类，里面包括了扫描
+			// 解析所有目前存在于BeanDefinitionMap中的配置类，里面包括了扫描
 			parser.parse(candidates);
+			// 验证配置类和@Bean方法（是否是final或static）
 			parser.validate();
 
+			// 拿到所有解析到的配置类
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
 			configClasses.removeAll(alreadyParsed);
 
@@ -344,29 +356,44 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 						registry, this.sourceExtractor, this.resourceLoader, this.environment,
 						this.importBeanNameGenerator, parser.getImportRegistry());
 			}
+			// 从配置类中加载bd，包括@Bean方法，BeanDefinitionRegistrars
 			this.reader.loadBeanDefinitions(configClasses);
+			// 将configClasses添加到已经解析的集合中，注意作用域是这个do while循环中
 			alreadyParsed.addAll(configClasses);
 
+			// 清空candidates
 			candidates.clear();
+			// 如果此时beanDefinitionMap中的bd数量大于初始数量（就是Spring自带的bd + 开发者手动注册的数量），即已经确定解析过的
 			if (registry.getBeanDefinitionCount() > candidateNames.length) {
+				// 获取当前的bd名称
 				String[] newCandidateNames = registry.getBeanDefinitionNames();
+				// 保存旧的
 				Set<String> oldCandidateNames = new HashSet<>(Arrays.asList(candidateNames));
 				Set<String> alreadyParsedClasses = new HashSet<>();
+				// 遍历已经解析过的类，添加到alreadyParsedClasses
+				// 这个循环等价于alreadyParsedClasses.addAll(alreadyParsed.getClassName)
+				// alreadyParsed就是parse解析过的
 				for (ConfigurationClass configurationClass : alreadyParsed) {
 					alreadyParsedClasses.add(configurationClass.getMetadata().getClassName());
 				}
+				// newCandidateNames是当前容器中所有的bd
 				for (String candidateName : newCandidateNames) {
+					// 如果是新解析出来的，即不是初始的那几个，
 					if (!oldCandidateNames.contains(candidateName)) {
 						BeanDefinition bd = registry.getBeanDefinition(candidateName);
+						// 判断是否是候选配置类并且是否被parse解析过
 						if (ConfigurationClassUtils.checkConfigurationClassCandidate(bd, this.metadataReaderFactory) &&
 								!alreadyParsedClasses.contains(bd.getBeanClassName())) {
+							// 保存到candidates，注意candidates在上面解析过后就已经清空了
 							candidates.add(new BeanDefinitionHolder(bd, candidateName));
 						}
 					}
 				}
+				// 下次循环candidateNames就是里保存的就是已经解析过的className了
 				candidateNames = newCandidateNames;
 			}
 		}
+		// 不为null就继续循环
 		while (!candidates.isEmpty());
 
 		// Register the ImportRegistry as a bean in order to support ImportAware @Configuration classes

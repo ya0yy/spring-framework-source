@@ -73,6 +73,10 @@ class ComponentScanAnnotationParser {
 	}
 
 
+	/**
+	 * 大致逻辑：通过@ComponentScan注解中的属性值，构建ClassPathBeanDefinitionScanner对象，然后通过scanner对象扫描
+	 *
+	 */
 	public Set<BeanDefinitionHolder> parse(AnnotationAttributes componentScan, final String declaringClass) {
 		// 新建扫描器
 		ClassPathBeanDefinitionScanner scanner = new ClassPathBeanDefinitionScanner(this.registry,

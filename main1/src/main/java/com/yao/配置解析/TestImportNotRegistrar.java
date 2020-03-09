@@ -1,8 +1,5 @@
 package com.yao.配置解析;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
  * 　　　　　　　┏┛┻━━━┛┻┓ + +
@@ -27,15 +24,12 @@ import org.springframework.context.annotation.Configuration;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-02 16:41
+ * 2020-03-08 17:51
  *
  * @author yaoyy
  */
-@Configuration
-public class TestConfig0 {
-
-	@Bean
-	public String stringBean() {
-		return "字符串bean";
+public class TestImportNotRegistrar {
+	public TestImportNotRegistrar() {
+		System.out.println("我是无接口实现的Import类 构造");
 	}
 }

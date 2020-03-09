@@ -137,14 +137,19 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 将被import的类添加到bdmap
+		// 包括（成员类，@Import的未实现BeanDefinitionRegistrar的类），成员类一般不会，因为成员类通常都会被扫描出来，当作ScannedGenericBeanDefinition，而这里面是用的bd是AnnotatedGenericBeanDefinition
 		if (configClass.isImported()) {
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
+		// 加载@Bean方法的bean到beanDefinitionMap中
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
+		// 解析@ImportResources的xml配置
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
+		// 里面会执行加入到importBeanDefinitionRegistrars中的registrar（@Import的BeanDefinitionRegistrar的实现）
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 

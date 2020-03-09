@@ -162,6 +162,9 @@ final class ConfigurationClass {
 	 * automatically registered due to being nested within another configuration class.
 	 * @since 3.1.1
 	 * @see #getImportedBy()
+	 * 如果B是A类的成员类，并被标记为@Configuration，也并不能百分百确定在最终的解析结果中B就是importedBy A，因为如果解析A的过程中会先解析A的成员类，
+	 * 然后紧接着去解析A上的@ComponentScan，这个时候如果A在这个扫描的包下，也就是说A的成员类B如果在这个包下，B会被再次解析，
+	 * 此时B只是当作一个普通的被扫描到的配置类解析，发现configurationClasses中已经存在了B，则会删除旧的解析结果，再次去解析B，此时就出现了B不是 importBy A的情况
 	 */
 	public boolean isImported() {
 		return !this.importedBy.isEmpty();
@@ -212,10 +215,13 @@ final class ConfigurationClass {
 	public void validate(ProblemReporter problemReporter) {
 		// A configuration class may not be final (CGLIB limitation) unless it declares proxyBeanMethods=false
 		Map<String, Object> attributes = this.metadata.getAnnotationAttributes(Configuration.class.getName());
+		// 如果是@Configuration并且proxyBeanMethods是true
 		if (attributes != null && (Boolean) attributes.get("proxyBeanMethods")) {
+			// 如果是final类就抛异常
 			if (this.metadata.isFinal()) {
 				problemReporter.error(new FinalConfigurationProblem());
 			}
+			// 验证@Bean方法，如果不可重写就抛出异常
 			for (BeanMethod beanMethod : this.beanMethods) {
 				beanMethod.validate(problemReporter);
 			}

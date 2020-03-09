@@ -258,15 +258,14 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		abd.setInstanceSupplier(supplier);
-		// 获取scope元数据
+		// 获取scope元数据，其实也就两个属性，一个是scope名称，一个是scope代理模式
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
 		// 如果beanName为空就设置默认的beanName
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
 
-		// 这里又处理了一些属性，lazy, primary, dependsOn等等
+		// 处理一些spring公共注解，lazy, primary, dependsOn等等
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(abd);
-		// 此处不是太明白，为什么上一行明明已经处理了这些注解，
 		if (qualifiers != null) {
 			for (Class<? extends Annotation> qualifier : qualifiers) {
 				if (Primary.class == qualifier) {
@@ -287,8 +286,9 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(abd, beanName);
-		// 判断scope代理模式是否是no，如果是就直接返回传入的这个BeanDefinitionHolder
+		// 判断scope代理模式是否是no，如果是就直接return传入的这个BeanDefinitionHolder
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		// 注册到bdmap中
 		BeanDefinitionReaderUtils.registerBeanDefinition(definitionHolder, this.registry);
 	}
 

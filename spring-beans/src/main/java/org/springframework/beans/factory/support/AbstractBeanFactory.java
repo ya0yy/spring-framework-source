@@ -500,18 +500,25 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		String beanName = transformedBeanName(name);
 
 		// Check manually registered singletons.
+		// 从单例池获取实例
 		Object beanInstance = getSingleton(beanName, false);
 		if (beanInstance != null && beanInstance.getClass() != NullBean.class) {
+			// 实例是否是FactoryBean类型
 			if (beanInstance instanceof FactoryBean) {
+				// beanName不是&前缀
 				if (!BeanFactoryUtils.isFactoryDereference(name)) {
+					// 从FactoryBean获取类型，getType方法，匹配该类型
 					Class<?> type = getTypeForFactoryBean((FactoryBean<?>) beanInstance);
 					return (type != null && typeToMatch.isAssignableFrom(type));
 				}
+				// 否则就直接匹配实例本身
 				else {
 					return typeToMatch.isInstance(beanInstance);
 				}
 			}
+			// 否则如果要获取的name不是以&开头的
 			else if (!BeanFactoryUtils.isFactoryDereference(name)) {
+				// 直接匹配实例类型
 				if (typeToMatch.isInstance(beanInstance)) {
 					// Direct match for exposed instance?
 					return true;
@@ -1670,6 +1677,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 			Object beanInstance, String name, String beanName, @Nullable RootBeanDefinition mbd) {
 
 		// Don't let calling code try to dereference the factory if the bean isn't a factory.
+		// 如果该名称是一个FactoryBean（&开头）
 		if (BeanFactoryUtils.isFactoryDereference(name)) {
 			if (beanInstance instanceof NullBean) {
 				return beanInstance;
@@ -1682,12 +1690,14 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 		// Now we have the bean instance, which may be a normal bean or a FactoryBean.
 		// If it's a FactoryBean, we use it to create a bean instance, unless the
 		// caller actually wants a reference to the factory.
+		// 如果不是FactoryBean类型或者name以&开头直接return该bean
 		if (!(beanInstance instanceof FactoryBean) || BeanFactoryUtils.isFactoryDereference(name)) {
 			return beanInstance;
 		}
 
 		Object object = null;
 		if (mbd == null) {
+			// 从FactoryBean缓存中获取对象
 			object = getCachedObjectForFactoryBean(beanName);
 		}
 		if (object == null) {
@@ -1698,6 +1708,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 				mbd = getMergedLocalBeanDefinition(beanName);
 			}
 			boolean synthetic = (mbd != null && mbd.isSynthetic());
+			// 这里传一个非合成类，在方法里其实就是调用后置处理
 			object = getObjectFromFactoryBean(factory, beanName, !synthetic);
 		}
 		return object;

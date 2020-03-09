@@ -1,9 +1,9 @@
-package com.yao.bean的初始化方法;
+package com.yao.配置解析;
 
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
+import com.yao.impo.ImportBeanDefinitionRegistrarA;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -29,20 +29,19 @@ import java.util.ArrayList;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-09 19:12
+ * 2020-03-02 16:41
  *
  * @author yaoyy
  */
-@Component
-public class TestFactoryBean implements FactoryBean {
-
-	@Override
-	public Object getObject() throws Exception {
-		return new ArrayList(8);
+@Configuration
+@Import({ImportBeanDefinitionRegistrarA.class, TestImportNotRegistrar.class})
+public class ParentAppRun {
+	public ParentAppRun() {
+		System.out.println("TestConfig0构造");
 	}
 
-	@Override
-	public Class<?> getObjectType() {
-		return ArrayList.class;
+	@Bean
+	public String stringBean() {
+		return "字符串bean";
 	}
 }

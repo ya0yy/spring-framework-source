@@ -1230,7 +1230,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			return obtainFromSupplier(instanceSupplier, beanName);
 		}
 
-		// 如果它有工厂方法就用工厂方法创建，工厂方法就是@Bean，也就是说他是不是@Bean创建
+		// 如果它有工厂方法就用工厂方法创建，工厂方法就是@Bean或者xml配置中的factory-method
 		if (mbd.getFactoryMethodName() != null) {
 			return instantiateUsingFactoryMethod(beanName, mbd, args);
 		}
@@ -1328,6 +1328,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			registerDependentBean(beanName, currentlyCreatedBean);
 		}
 
+		// org.springframework.beans.factory.support.AbstractBeanFactory.getObjectForBeanInstance
 		return super.getObjectForBeanInstance(beanInstance, name, beanName, mbd);
 	}
 

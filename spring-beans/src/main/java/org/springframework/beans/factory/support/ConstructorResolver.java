@@ -430,13 +430,16 @@ class ConstructorResolver {
 		Class<?> factoryClass;
 		boolean isStatic;
 
+		// @Bean方法的工厂bean是所属的配置类，这里说的并不是那个生产bean接口
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
+			// 如果所属配置类的@Bean方法生产的是自己的类型则抛出异常
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
 			}
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
+			// 如果该bd是单例的并且单例池已经有了该beanName的bean，则抛异常
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
@@ -458,12 +461,14 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+		// 这个explicitArgs就是实例化bean经常见到的那个Object数组，作为额外参数用的，一般为null
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
 		else {
 			Object[] argsToResolve = null;
 			synchronized (mbd.constructorArgumentLock) {
+				// 拿到工厂方法
 				factoryMethodToUse = (Method) mbd.resolvedConstructorOrFactoryMethod;
 				if (factoryMethodToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached factory method...
@@ -484,14 +489,18 @@ class ConstructorResolver {
 			factoryClass = ClassUtils.getUserClass(factoryClass);
 
 			List<Method> candidateList = null;
+			// 如果只有一个工厂方法
 			if (mbd.isFactoryMethodUnique) {
 				if (factoryMethodToUse == null) {
+					// 拿到唯一工厂方法
 					factoryMethodToUse = mbd.getResolvedFactoryMethod();
 				}
+				// 将唯一工厂方法存入集合
 				if (factoryMethodToUse != null) {
 					candidateList = Collections.singletonList(factoryMethodToUse);
 				}
 			}
+			// 如果还拿不到，就从所属配置类拿到所有工厂方法(注解通过@Bean判断，xml通过配置里的所有factory-method判断)
 			if (candidateList == null) {
 				candidateList = new ArrayList<>();
 				Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
@@ -502,20 +511,27 @@ class ConstructorResolver {
 				}
 			}
 
+			// 候选的工厂方法只有一个 && 没有额外参数 && 没有可选的构造器参数（xml配置的构造器参数）
 			if (candidateList.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
+				// 拿到工厂方法
 				Method uniqueCandidate = candidateList.get(0);
+				// 如果该工厂方法不需要参数
 				if (uniqueCandidate.getParameterCount() == 0) {
 					mbd.factoryMethodToIntrospect = uniqueCandidate;
 					synchronized (mbd.constructorArgumentLock) {
+						// 赋值，标记已经解析过了
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
 						mbd.constructorArgumentsResolved = true;
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;
 					}
+					// 根据工厂方法进行实例化
 					bw.setBeanInstance(instantiate(beanName, mbd, factoryBean, uniqueCandidate, EMPTY_ARGS));
 					return bw;
 				}
 			}
 
+			// 如果有多个候选的工厂方法
+			// TODO: 2020/3/10 @Bean方法实例化bean未完
 			Method[] candidates = candidateList.toArray(new Method[0]);
 			AutowireUtils.sortFactoryMethods(candidates);
 

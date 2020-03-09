@@ -1,9 +1,9 @@
 package com.yao.bean的初始化方法;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -29,19 +29,20 @@ import org.springframework.context.annotation.Configuration;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-02 14:32
+ * 2020-03-09 19:12
  *
  * @author yaoyy
  */
-@ComponentScan("com.yao.bean的初始化方法")
-@Configuration
-public class App {
-	public static void main(String[] args) {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(App.class);
+@Component
+public class TestFactoryBean implements FactoryBean {
+
+	@Override
+	public Object getObject() throws Exception {
+		return new ArrayList(8);
 	}
 
-	@Bean
-	public TestMethodBean testMethodBean() {
-		return new TestMethodBean();
+	@Override
+	public Class<?> getObjectType() {
+		return ArrayList.class;
 	}
 }

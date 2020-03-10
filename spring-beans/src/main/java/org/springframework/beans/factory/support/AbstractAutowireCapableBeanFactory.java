@@ -413,7 +413,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// ApplicationContextAwareProcessor 完成一些Aware接口的值注入
 		// ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor
 		// PostProcessorRegistrationDelegate.BeanPostProcessorChecker 直接return参数bean
-		// CommonAnnotationBeanPostProcessor
+		// CommonAnnotationBeanPostProcessor 调用initMethod
 		// AutowiredAnnotationBeanPostProcessor 直接return参数bean
 		// ApplicationListenerDetector 直接return参数bean
 		Object result = existingBean;
@@ -1882,6 +1882,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		Object wrappedBean = bean;
 		if (mbd == null || !mbd.isSynthetic()) {
+			// 第七次后置处理器，调用initMethod方法，
 			wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
 		}
 

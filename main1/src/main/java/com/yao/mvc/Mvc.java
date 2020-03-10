@@ -64,11 +64,10 @@ public class Mvc {
 		Tomcat tomcat = new Tomcat();
 		tomcat.setPort(8082);
 		Context context = tomcat.addContext("/a", "/Users/yaoyang/IdeaProjects/spring-framework/tomcat.8082/");
-//		Wrapper dispatcher = Tomcat.addServlet(context, "dispatcher", initDispatcherServlet());
-		tomcat.addServlet("/a", "dispatcher", initDispatcherServlet()).setStartStopThreads(1);
-		context.addServletMappingDecoded("*.do", "dispatcher");
+//		tomcat.addServlet("/a", "dispatcher", initDispatcherServlet()).setStartStopThreads(1);
+//		context.addServletMappingDecoded("*.do", "dispatcher");
 		// 执行tomcat生命周期
-//		context.addLifecycleListener((LifecycleListener) Class.forName(tomcat.getHost().getConfigClass()).newInstance());
+		context.addLifecycleListener((LifecycleListener) Class.forName(tomcat.getHost().getConfigClass()).newInstance());
 		try {
 			// tomcat9.0要显式调用getConnector才能监听端口
 			tomcat.getConnector();

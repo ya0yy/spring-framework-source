@@ -256,7 +256,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			if (this.advisedBeans.containsKey(cacheKey)) {
 				return null;
 			}
-			// 如果是aop基础类(Advise, Point, @Aspect等等)或应该跳过(暂时无具体逻辑)则标记为不需要代理，就将cacheKey标记为不需要代理
+			// 如果是aop基础类(Advise, Point, @Aspect等等)或应该跳过(beanName和spring的通知相同)则标记为不需要代理，就将cacheKey标记为不需要代理
 			if (isInfrastructureClass(beanClass) || shouldSkip(beanClass, beanName)) {
 				this.advisedBeans.put(cacheKey, Boolean.FALSE);
 				return null;

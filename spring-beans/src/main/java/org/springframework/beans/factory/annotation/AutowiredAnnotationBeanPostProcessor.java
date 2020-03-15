@@ -251,6 +251,7 @@ public class AutowiredAnnotationBeanPostProcessor extends InstantiationAwareBean
 			throws BeanCreationException {
 
 		// Let's check for lookup methods here..
+		// 将@Lookup注解信息添加到methodOverrides，在创建实例的过程中会判断是否有覆写方法，如果有就创建cglib的代理对象
 		if (!this.lookupMethodsChecked.contains(beanName)) {
 			if (AnnotationUtils.isCandidateClass(beanClass, Lookup.class)) {
 				try {

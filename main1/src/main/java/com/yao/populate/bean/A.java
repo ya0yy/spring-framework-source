@@ -48,7 +48,7 @@ public class A {
 	//	@Value("jack.name")
 	String str;
 
-	//	@Value("#{c}")
+		@Value("#{c}")
 //	@Value("${bean.name}")
 //	@Autowired
 	public D c;

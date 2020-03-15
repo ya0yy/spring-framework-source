@@ -432,7 +432,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			throws BeansException {
 
 		Object result = existingBean;
-		// 执行所有BeanPostProcessor的postProcessAfterInitialization方法，其中包括aop生成代理对象org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.postProcessAfterInitialization
+		// 执行所有BeanPostProcessor的postProcessAfterInitialization方法，其中包括
+		// aop生成代理对象org.springframework.aop.framework.autoproxy.AbstractAutoProxyCreator.postProcessAfterInitialization
+		// 如果该bean是一个spring的监听器，ApplicationListenerDetector会将它加入到监听中
 		for (BeanPostProcessor processor : getBeanPostProcessors()) {
 			Object current = processor.postProcessAfterInitialization(result, beanName);
 			if (current == null) {
@@ -511,7 +513,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		try {
 			// Give BeanPostProcessors a chance to return a proxy instead of the target bean instance.
-			// 第一次调用Bean后置处理器，aop相关，将不需要aop的bean标记到advisedBeans中
+			// 第一次调用Bean后置处理器，aop相关，将不需要aop的bean标记到advisedBeans中（另外会将所有通知解析到出来，放到map中，但是不会实例化切面，会优先实例化实现了Advisor接口的bean）
 			Object bean = resolveBeforeInstantiation(beanName, mbdToUse);
 			if (bean != null) {
 				return bean;

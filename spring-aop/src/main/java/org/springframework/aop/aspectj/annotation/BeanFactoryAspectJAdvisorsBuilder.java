@@ -81,50 +81,70 @@ public class BeanFactoryAspectJAdvisorsBuilder {
 	 * @see #isEligibleBean
 	 */
 	public List<Advisor> buildAspectJAdvisors() {
+		// 拿到当前已经解析过的切面beanName
 		List<String> aspectNames = this.aspectBeanNames;
 
+		// 如果没有
 		if (aspectNames == null) {
 			synchronized (this) {
 				aspectNames = this.aspectBeanNames;
 				if (aspectNames == null) {
 					List<Advisor> advisors = new ArrayList<>();
 					aspectNames = new ArrayList<>();
+					// 获取容器中所有的beanName
 					String[] beanNames = BeanFactoryUtils.beanNamesForTypeIncludingAncestors(
 							this.beanFactory, Object.class, true, false);
+					// 遍历
 					for (String beanName : beanNames) {
+						// 如果不是一个合格的bean（根据正则表达式判断切面是否合格，spring默认所有切面都视为合格）
 						if (!isEligibleBean(beanName)) {
 							continue;
 						}
 						// We must be careful not to instantiate beans eagerly as in this case they
 						// would be cached by the Spring container but would not have been weaved.
+						// 上面注释大意是说我们要小心不要将bean实例化出来，所以猜想这里用getType而不用getBean的原因
 						Class<?> beanType = this.beanFactory.getType(beanName);
 						if (beanType == null) {
 							continue;
 						}
+						// 如果是带有@Aspect注解的bean
 						if (this.advisorFactory.isAspect(beanType)) {
+							// 添加到list
 							aspectNames.add(beanName);
+							// 封装成切面元数据
 							AspectMetadata amd = new AspectMetadata(beanType, beanName);
+							// 如果切面实例化模式是单例的
 							if (amd.getAjType().getPerClause().getKind() == PerClauseKind.SINGLETON) {
+								// 根据beanFactory和beanName new出切面实例化工厂（也就是切面创建工厂）
 								MetadataAwareAspectInstanceFactory factory =
 										new BeanFactoryAspectInstanceFactory(this.beanFactory, beanName);
+								// 根据切面工厂提取出所有通知对象
 								List<Advisor> classAdvisors = this.advisorFactory.getAdvisors(factory);
+								// 如果切面是单例模式
 								if (this.beanFactory.isSingleton(beanName)) {
+									// 直接缓存
 									this.advisorsCache.put(beanName, classAdvisors);
 								}
 								else {
+									// 否则缓存工厂
 									this.aspectFactoryCache.put(beanName, factory);
 								}
+								// 添加所有该切面的通知
 								advisors.addAll(classAdvisors);
 							}
 							else {
 								// Per target or per this.
+								// 否则，这里意思是切面不是单例的，但是对spring申明是单例的，抛出异常
 								if (this.beanFactory.isSingleton(beanName)) {
 									throw new IllegalArgumentException("Bean with name '" + beanName +
 											"' is a singleton, but aspect instantiation model is not singleton");
 								}
+								// 创建原型切面实例工厂，这里的原型不是spring里的原型哦
 								MetadataAwareAspectInstanceFactory factory =
 										new PrototypeAspectInstanceFactory(this.beanFactory, beanName);
+								// 缓存到切面工厂
 								this.aspectFactoryCache.put(beanName, factory);
+								// 添加
 								advisors.addAll(this.advisorFactory.getAdvisors(factory));
 							}
 						}

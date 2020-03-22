@@ -116,12 +116,15 @@ class TypeConverterDelegate {
 			@Nullable Class<T> requiredType, @Nullable TypeDescriptor typeDescriptor) throws IllegalArgumentException {
 
 		// Custom editor for this type?
+		// 根据类型和名称寻找自定义的属性编辑器
 		PropertyEditor editor = this.propertyEditorRegistry.findCustomEditor(requiredType, propertyName);
 
 		ConversionFailedException conversionAttemptEx = null;
 
 		// No custom editor but custom ConversionService specified?
+		// 获取自定义ConversionService
 		ConversionService conversionService = this.propertyEditorRegistry.getConversionService();
+		// 大致意思是conversionService不为null就走自定义的ConversionService逻辑
 		if (editor == null && conversionService != null && newValue != null && typeDescriptor != null) {
 			TypeDescriptor sourceTypeDesc = TypeDescriptor.forObject(newValue);
 			if (conversionService.canConvert(sourceTypeDesc, typeDescriptor)) {
@@ -138,7 +141,9 @@ class TypeConverterDelegate {
 		Object convertedValue = newValue;
 
 		// Value not of required type?
+		// 自定义属性编辑器不为null或需要转换的bean不是requiredType类型的
 		if (editor != null || (requiredType != null && !ClassUtils.isAssignableValue(requiredType, convertedValue))) {
+			// String和Collection类型的转换吧
 			if (typeDescriptor != null && requiredType != null && Collection.class.isAssignableFrom(requiredType) &&
 					convertedValue instanceof String) {
 				TypeDescriptor elementTypeDesc = typeDescriptor.getElementTypeDescriptor();
@@ -149,9 +154,12 @@ class TypeConverterDelegate {
 					}
 				}
 			}
+			// 属性编辑器为null
 			if (editor == null) {
+				// 查找属性编辑器
 				editor = findDefaultEditor(requiredType);
 			}
+			// 转换
 			convertedValue = doConvertValue(oldValue, convertedValue, requiredType, editor);
 		}
 
@@ -331,9 +339,11 @@ class TypeConverterDelegate {
 		PropertyEditor editor = null;
 		if (requiredType != null) {
 			// No custom editor -> check BeanWrapperImpl's default editors.
+			// 从spring默认的编辑器中找
 			editor = this.propertyEditorRegistry.getDefaultEditor(requiredType);
 			if (editor == null && String.class != requiredType) {
 				// No BeanWrapper default editor -> check standard JavaBean editor.
+				// 从类路径找，找class类名为所需类型全限定类名+Editor的类，然后用类加载器加载，并且new出实例
 				editor = BeanUtils.findEditorByConvention(requiredType);
 			}
 		}

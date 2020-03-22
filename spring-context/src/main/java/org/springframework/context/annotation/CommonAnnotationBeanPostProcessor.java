@@ -185,6 +185,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 
 	private final Set<String> ignoredResourceTypes = new HashSet<>(1);
 
+	// 标记名称匹配不成功时候就去尝试类型匹配
 	private boolean fallbackToDefaultTypeMatch = true;
 
 	private boolean alwaysUseJndiLookup = false;
@@ -531,13 +532,16 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		if (factory instanceof AutowireCapableBeanFactory) {
 			AutowireCapableBeanFactory beanFactory = (AutowireCapableBeanFactory) factory;
 			DependencyDescriptor descriptor = element.getDependencyDescriptor();
+			// 是否退回类型匹配 && @Resource的name属性是默认的（默认的就是注解中定义的default ""） && 容器中不含该name
 			if (this.fallbackToDefaultTypeMatch && element.isDefaultName && !factory.containsBean(name)) {
+				// 那么就直接走@Autowired的逻辑
 				autowiredBeanNames = new LinkedHashSet<>();
 				resource = beanFactory.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, null);
 				if (resource == null) {
 					throw new NoSuchBeanDefinitionException(element.getLookupType(), "No resolvable resource object");
 				}
 			}
+			// 否则就根据name去获取
 			else {
 				resource = beanFactory.resolveBeanByName(name, descriptor);
 				autowiredBeanNames = Collections.singleton(name);

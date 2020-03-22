@@ -1,10 +1,8 @@
-package com.yao.populate;
+package com.yao.mybatis;
 
-import com.yao.populate.bean.A;
-import com.yao.populate.bean.C1;
-import com.yao.populate.bean.ResourceBean;
-import org.springframework.context.annotation.*;
-import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -30,23 +28,16 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-02-28 17:21
+ * 2020-03-16 22:58
  *
  * @author yaoyy
  */
-@ComponentScan("com.yao.populate")
+@MapperScan("com.yao.mybatis.mapper")
+//@ComponentScan("com.yao.mybatis")
 @Configuration
-@PropertySource("classpath:com/yao/properties.properties")
-public class App {
-
-	ResourceBean rb = new ResourceBean(this);
+public class MybatisAppConfig {
 
 	public static void main(String[] args) {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(App.class);
-		System.out.println(ac.getBean(A.class).b);
-	}
-
-	public ResourceBean getResourceBean() {
-		return this.rb;
+		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(MybatisAppConfig.class);
 	}
 }

@@ -1,10 +1,9 @@
-package com.yao.populate;
+package com.yao.populate.bean;
 
-import com.yao.populate.bean.A;
-import com.yao.populate.bean.C1;
-import com.yao.populate.bean.ResourceBean;
-import org.springframework.context.annotation.*;
-import org.springframework.core.DefaultParameterNameDiscoverer;
+import com.yao.populate.App;
+
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorSupport;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -30,23 +29,15 @@ import org.springframework.core.DefaultParameterNameDiscoverer;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-02-28 17:21
+ * 2020-03-17 00:59
  *
  * @author yaoyy
  */
-@ComponentScan("com.yao.populate")
-@Configuration
-@PropertySource("classpath:com/yao/properties.properties")
-public class App {
+public class ResourceBeanEditor extends PropertyEditorSupport {
 
-	ResourceBean rb = new ResourceBean(this);
-
-	public static void main(String[] args) {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(App.class);
-		System.out.println(ac.getBean(A.class).b);
-	}
-
-	public ResourceBean getResourceBean() {
-		return this.rb;
+	@Override
+	public void setValue(Object value) {
+		App app = (App) value;
+		super.setValue(app.getResourceBean());
 	}
 }

@@ -35,6 +35,6 @@ import java.util.Map;
  */
 public interface BlogMapper {
 
-	@Select("select * from y_item")
+	@Select("select * from spring_item")
 	List<Map<String, String>> selectList();
 }

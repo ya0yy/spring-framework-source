@@ -54,7 +54,7 @@ public class MybatisLogTest {
 
 	@Bean
 	public DataSource dataSource() {
-		return new DriverManagerDataSource("jdbc:mysql://192.168.109.132:3306/final_consistency_test_item", "root", "admin");
+		return new DriverManagerDataSource("jdbc:mysql://192.168.109.132:3306/spring_test", "root", "admin");
 	}
 
 	@Bean

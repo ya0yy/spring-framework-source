@@ -1,9 +1,6 @@
-package com.yao.log.mybatis;
+package com.yao.transaction;
 
-import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
-import java.util.Map;
+import org.apache.ibatis.annotations.Insert;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -29,12 +26,12 @@ import java.util.Map;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-26 01:22
+ * 2020-03-27 00:50
  *
  * @author yaoyy
  */
-public interface BlogMapper {
+public interface ItemMapper {
 
-	@Select("select * from spring_log")
-	List<Map<String, String>> selectList();
+	@Insert("insert into spring_item values(null, '小毛铺', 18.00, 2)")
+	void insertMP();
 }

@@ -1,9 +1,7 @@
-package com.yao.log.mybatis;
+package com.yao.transaction;
 
-import org.apache.ibatis.annotations.Select;
-
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -29,12 +27,17 @@ import java.util.Map;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-26 01:22
+ * 2020-03-27 00:55
  *
  * @author yaoyy
  */
-public interface BlogMapper {
+@Service
+public class OrderService {
 
-	@Select("select * from spring_log")
-	List<Map<String, String>> selectList();
+	@Autowired
+	OrderMapper orderMapper;
+
+	public void insert() {
+		orderMapper.insertOrder();
+	}
 }

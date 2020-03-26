@@ -3,11 +3,11 @@ package com.yao.transaction;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
@@ -42,15 +42,15 @@ import javax.sql.DataSource;
 @MapperScan
 @ComponentScan
 @Configuration
-public class AppConfig {
+@EnableTransactionManagement
+@EnableAspectJAutoProxy(exposeProxy = true)
+public class MainConfig {
 	public static void main(String[] args) {
-		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(AppConfig.class);
-		ItemService itemService = ac.getBean(ItemService.class);
-		OrderService orderService = ac.getBean(OrderService.class);
+		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(MainConfig.class);
+		AService itemService = ac.getBean(AService.class);
+		BService orderService = ac.getBean(BService.class);
 		itemService.insert();
-		orderService.insert();
 	}
-
 
 	@Bean
 	public DataSource dataSource() {
@@ -58,9 +58,17 @@ public class AppConfig {
 	}
 
 	@Bean
+	public TransactionManager transactionManager() {
+		return new DataSourceTransactionManager(dataSource());
+	}
+
+	@Bean
 	public SqlSessionFactory sqlSessionFactory() throws Exception {
+		DataSource dataSource = dataSource();
+		dataSource.getConnection().createStatement().execute("TRUNCATE spring_transaction_a;");
+		dataSource.getConnection().createStatement().execute("TRUNCATE spring_transaction_b;");
 		SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-		factoryBean.setDataSource(dataSource());
+		factoryBean.setDataSource(dataSource);
 		return factoryBean.getObject();
 	}
 }

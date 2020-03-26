@@ -1,7 +1,6 @@
 package com.yao.transaction;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.ibatis.annotations.Insert;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -27,17 +26,15 @@ import org.springframework.stereotype.Service;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-27 00:55
+ * 2020-03-27 00:50
  *
  * @author yaoyy
  */
-@Service
-public class OrderService {
+public interface AMapper {
 
-	@Autowired
-	OrderMapper orderMapper;
+	@Insert("insert into spring_transaction_a values(null, '小毛铺', now())")
+	void insert();
 
-	public void insert() {
-		orderMapper.insertOrder();
-	}
+	@Insert("insert into spring_transaction_a values(null, '苦荞酒', now())")
+	void insert0();
 }

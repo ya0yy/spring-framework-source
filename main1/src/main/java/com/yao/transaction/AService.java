@@ -1,7 +1,10 @@
 package com.yao.transaction;
 
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -32,12 +35,28 @@ import org.springframework.stereotype.Service;
  * @author yaoyy
  */
 @Service
-public class ItemService {
+public class AService {
 
 	@Autowired
-	ItemMapper itemMapper;
+	AMapper a;
 
+	@Autowired
+	BService b;
+
+	@Transactional
 	public void insert() {
-		itemMapper.insertMP();
+		a.insert();
+		try {
+			((AService) AopContext.currentProxy()).insert0();
+			insert0();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void insert0() {
+		a.insert0();
+		throw new RuntimeException();
 	}
 }

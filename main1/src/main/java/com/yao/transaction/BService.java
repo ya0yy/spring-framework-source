@@ -1,6 +1,10 @@
 package com.yao.transaction;
 
-import org.apache.ibatis.annotations.Insert;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.transaction.annotation.Propagation.*;
 
 /**
  * 　　　　　　　 ┏┓　 ┏┓+ +
@@ -26,12 +30,19 @@ import org.apache.ibatis.annotations.Insert;
  * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
  * <p>
  * spring
- * 2020-03-27 00:50
+ * 2020-03-27 00:55
  *
  * @author yaoyy
  */
-public interface ItemMapper {
+@Service
+public class BService {
 
-	@Insert("insert into spring_item values(null, '小毛铺', 18.00, 2)")
-	void insertMP();
+	@Autowired
+	BMapper orderMapper;
+
+	@Transactional(propagation = REQUIRES_NEW)
+	public void insert() {
+		orderMapper.insertOrder();
+		throw new RuntimeException();
+	}
 }

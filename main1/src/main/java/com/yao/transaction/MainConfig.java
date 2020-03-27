@@ -12,29 +12,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.sql.DataSource;
 
 /**
- * 　　　　　　　 ┏┓　 ┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　┃
- * 　　　　　　　┃　　　━　　 ┃ ++ + + +
- * 　　　　　　 ████━████  ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃ + + + +
- * 　　　　　　　　 ┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　 ┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃　　+
- * 　　　　　　　　 ┃　 　 ┗━━━┓ + +
- * 　　　　　　　　 ┃ 　　　　   ┣┓
- * 　　　　　　　　 ┃ 　　　　　 ┏┛
- * 　　　　　　　　 ┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　  ┃┫┫ ┃┫┫
- * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
- * <p>
- * spring
  * 2020-03-27 00:32
  *
  * @author yaoyy

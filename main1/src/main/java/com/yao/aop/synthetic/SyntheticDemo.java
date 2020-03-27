@@ -3,29 +3,6 @@ package com.yao.aop.synthetic;
 import java.lang.reflect.Constructor;
 
 /**
- * 　　　　　　　 ┏┓　 ┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　┃
- * 　　　　　　　┃　　　━　　 ┃ ++ + + +
- * 　　　　　　 ████━████  ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃ + + + +
- * 　　　　　　　　 ┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　 ┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃　　+
- * 　　　　　　　　 ┃　 　 ┗━━━┓ + +
- * 　　　　　　　　 ┃ 　　　　   ┣┓
- * 　　　　　　　　 ┃ 　　　　　 ┏┛
- * 　　　　　　　　 ┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　  ┃┫┫ ┃┫┫
- * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
- * <p>
- * spring
  * 2020-02-17 22:45
  *
  * 非static的inner class里面都会有一个this$0的字段保存它的父对象

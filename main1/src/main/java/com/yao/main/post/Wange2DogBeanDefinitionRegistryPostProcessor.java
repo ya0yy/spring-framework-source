@@ -10,29 +10,6 @@ import org.springframework.core.Ordered;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 　　　　　　　 ┏┓　 ┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　┃
- * 　　　　　　　┃　　　━　　 ┃ ++ + + +
- * 　　　　　　 ████━████  ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃ + + + +
- * 　　　　　　　　 ┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　 ┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃　　+
- * 　　　　　　　　 ┃　 　 ┗━━━┓ + +
- * 　　　　　　　　 ┃ 　　　　   ┣┓
- * 　　　　　　　　 ┃ 　　　　　 ┏┛
- * 　　　　　　　　 ┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　  ┃┫┫ ┃┫┫
- * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
- * <p>
- * spring
  * 2019-07-01 15:22
  *
  * 新增一个实现了Ordered接口的BeanDefinitionRegistryPostProcessor

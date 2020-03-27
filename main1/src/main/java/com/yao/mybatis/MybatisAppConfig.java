@@ -5,29 +5,6 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.annotation.Configuration;
 
 /**
- * 　　　　　　　 ┏┓　 ┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　┃
- * 　　　　　　　┃　　　━　　 ┃ ++ + + +
- * 　　　　　　 ████━████  ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃ + + + +
- * 　　　　　　　　 ┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　 ┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃　　+
- * 　　　　　　　　 ┃　 　 ┗━━━┓ + +
- * 　　　　　　　　 ┃ 　　　　   ┣┓
- * 　　　　　　　　 ┃ 　　　　　 ┏┛
- * 　　　　　　　　 ┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　  ┃┫┫ ┃┫┫
- * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
- * <p>
- * spring
  * 2020-03-16 22:58
  *
  * @author yaoyy

@@ -7,29 +7,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import java.util.ArrayList;
 
 /**
- * 　　　　　　　 ┏┓　 ┏┓+ +
- * 　　　　　　　┏┛┻━━━┛┻┓ + +
- * 　　　　　　　┃　　　　　　┃
- * 　　　　　　　┃　　　━　　 ┃ ++ + + +
- * 　　　　　　 ████━████  ┃+
- * 　　　　　　　┃　　　　　　　┃ +
- * 　　　　　　　┃　　　┻　　　┃
- * 　　　　　　　┃　　　　　　┃ + +
- * 　　　　　　　┗━┓　　　┏━┛
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃ + + + +
- * 　　　　　　　　 ┃　　　┃　　　　Code is far away from bug with the animal protecting
- * 　　　　　　　　 ┃　　　┃ + 　　　　神兽保佑,代码无bug
- * 　　　　　　　　 ┃　　　┃
- * 　　　　　　　　 ┃　　　┃　　+
- * 　　　　　　　　 ┃　 　 ┗━━━┓ + +
- * 　　　　　　　　 ┃ 　　　　   ┣┓
- * 　　　　　　　　 ┃ 　　　　　 ┏┛
- * 　　　　　　　　 ┗┓┓┏━┳┓┏┛ + + + +
- * 　　　　　　　　  ┃┫┫ ┃┫┫
- * 　　　　　　　　  ┗┻┛ ┗┻┛+ + + +
- * <p>
- * spring
  * 2020-03-02 16:42
  *
  * @author yaoyy

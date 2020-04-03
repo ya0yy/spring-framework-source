@@ -146,6 +146,7 @@ public abstract class AnnotationUtils {
 	 * if {@code true} is being returned here.
 	 * @since 5.2
 	 * @see #isCandidateClass(Class, String)
+	 * 确定给定的类是否适合携带指定的注释，只是说适不适合，并不是携带
 	 */
 	public static boolean isCandidateClass(Class<?> clazz, Class<? extends Annotation> annotationType) {
 		return isCandidateClass(clazz, annotationType.getName());

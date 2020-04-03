@@ -384,6 +384,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 		// Decorate event as an ApplicationEvent if necessary
 		ApplicationEvent applicationEvent;
+		// 如果不是ApplicationEvent，就将event当作source new出PayloadApplicationEvent（其实也是ApplicationEvent，只不过在该对象里这里的传参event变成了source ）
 		if (event instanceof ApplicationEvent) {
 			applicationEvent = (ApplicationEvent) event;
 		}
@@ -395,6 +396,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Multicast right now if possible - or lazily once the multicaster is initialized
+		// 如果可能的话，现在就进行多播，或者在多播机初始化后懒惰地进行多播。
 		if (this.earlyApplicationEvents != null) {
 			this.earlyApplicationEvents.add(applicationEvent);
 		}
@@ -403,6 +405,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		}
 
 		// Publish event via parent context as well...
+		// 如果有父容器还要将事件发布到父容器中
 		if (this.parent != null) {
 			if (this.parent instanceof AbstractApplicationContext) {
 				((AbstractApplicationContext) this.parent).publishEvent(event, eventType);
@@ -498,6 +501,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void addApplicationListener(ApplicationListener<?> listener) {
 		Assert.notNull(listener, "ApplicationListener must not be null");
+		// 这里一般不为null，spring注册监听器之前会初始化事件广播器
 		if (this.applicationEventMulticaster != null) {
 			this.applicationEventMulticaster.addApplicationListener(listener);
 		}
@@ -532,18 +536,22 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				invokeBeanFactoryPostProcessors(beanFactory);
 
 				// Register bean processors that intercept bean creation.
+				// 将Spring自带的所有bean后置处理器加入到容器中
 				registerBeanPostProcessors(beanFactory);
 
 				// Initialize message source for this context.
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
+				// 初始化事件广播器
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
+				// 空方法，留给子类实现
 				onRefresh();
 
 				// Check for listener beans and register them.
+				// 注册部分监听器（通过实现接口的方式）
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
@@ -829,12 +837,14 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void registerListeners() {
 		// Register statically specified listeners first.
+		// 执行到这里的时候由于bean还没有实例化，这里只能获取到通过api添加的监听器，
 		for (ApplicationListener<?> listener : getApplicationListeners()) {
 			getApplicationEventMulticaster().addApplicationListener(listener);
 		}
 
 		// Do not initialize FactoryBeans here: We need to leave all regular beans
 		// uninitialized to let post-processors apply to them!
+		// 获取当前容器中ApplicationListener的子类
 		String[] listenerBeanNames = getBeanNamesForType(ApplicationListener.class, true, false);
 		for (String listenerBeanName : listenerBeanNames) {
 			getApplicationEventMulticaster().addApplicationListenerBean(listenerBeanName);

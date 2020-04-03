@@ -22,9 +22,10 @@ public class AService {
 
 	@Transactional
 	public void insert() {
+		System.out.println(this.getClass());
 		a.insert();
 		try {
-			((AService) AopContext.currentProxy()).insert0();
+//			((AService) AopContext.currentProxy()).insert0();
 			insert0();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -33,6 +34,7 @@ public class AService {
 
 	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	public void insert0() {
+		System.out.println(this.getClass());
 		a.insert0();
 		throw new RuntimeException();
 	}

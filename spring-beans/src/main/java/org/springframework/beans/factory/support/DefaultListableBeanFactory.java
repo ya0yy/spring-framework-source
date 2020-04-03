@@ -890,7 +890,10 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		}
 
 		// Trigger post-initialization callback for all applicable beans...
+		// 为所有适用的Bean触发初始化后回调......
+		// 遍历所有beanName，执行SmartInitializingSingleton接口的方法，这里一般只有Spring自带的EventListenerMethodProcessor
 		for (String beanName : beanNames) {
+			// 获取bean单例对象，注意原型的不会执行
 			Object singletonInstance = getSingleton(beanName);
 			if (singletonInstance instanceof SmartInitializingSingleton) {
 				final SmartInitializingSingleton smartSingleton = (SmartInitializingSingleton) singletonInstance;

@@ -102,10 +102,13 @@ public class EventListenerMethodProcessor
 		ConfigurableListableBeanFactory beanFactory = this.beanFactory;
 		Assert.state(this.beanFactory != null, "No ConfigurableListableBeanFactory set");
 		String[] beanNames = beanFactory.getBeanNamesForType(Object.class);
+		// 遍历所有beanName
 		for (String beanName : beanNames) {
+			// 该bean不是scope代理的
 			if (!ScopedProxyUtils.isScopedTarget(beanName)) {
 				Class<?> type = null;
 				try {
+					// 如果是aop代理对象这行代码会返回该bean的原始class
 					type = AutoProxyUtils.determineTargetClass(beanFactory, beanName);
 				}
 				catch (Throwable ex) {
@@ -131,6 +134,7 @@ public class EventListenerMethodProcessor
 						}
 					}
 					try {
+						// 真正的处理，
 						processBean(beanName, type);
 					}
 					catch (Throwable ex) {
@@ -143,12 +147,16 @@ public class EventListenerMethodProcessor
 	}
 
 	private void processBean(final String beanName, final Class<?> targetType) {
+		// 排除已经解析过的并且没有@EventListener方法的class &&
 		if (!this.nonAnnotatedClasses.contains(targetType) &&
+				// 这一行并不是判断targetType的方法是否带有@EventListener注解，只是在判断targetType是否是Java自带的类 &&
 				AnnotationUtils.isCandidateClass(targetType, EventListener.class) &&
+				// 不是spring自己的类
 				!isSpringContainerClass(targetType)) {
 
 			Map<Method, EventListener> annotatedMethods = null;
 			try {
+				// 拿到targetClass所有@EventListener方法，存放于annotatedMethods<方法对象, 注解对象>
 				annotatedMethods = MethodIntrospector.selectMethods(targetType,
 						(MethodIntrospector.MetadataLookup<EventListener>) method ->
 								AnnotatedElementUtils.findMergedAnnotation(method, EventListener.class));
@@ -160,6 +168,7 @@ public class EventListenerMethodProcessor
 				}
 			}
 
+			// 如果没有@EventListener方法就添加到nonAnnotatedClasses中
 			if (CollectionUtils.isEmpty(annotatedMethods)) {
 				this.nonAnnotatedClasses.add(targetType);
 				if (logger.isTraceEnabled()) {
@@ -170,17 +179,24 @@ public class EventListenerMethodProcessor
 				// Non-empty set of methods
 				ConfigurableApplicationContext context = this.applicationContext;
 				Assert.state(context != null, "No ApplicationContext set");
+				// 这里应该只有一个DefaultEventListenerFactory，是在EventListenerMethodProcessor的bean工厂后置处理器的时候创建并添加到eventListenerFactories中的
 				List<EventListenerFactory> factories = this.eventListenerFactories;
 				Assert.state(factories != null, "EventListenerFactory List not initialized");
+				// 遍历该bean中所有@nonAnnotatedClasses方法
 				for (Method method : annotatedMethods.keySet()) {
 					for (EventListenerFactory factory : factories) {
+						// 判断该方法是否匹配该工厂（策略者模式），DefaultEventListenerFactory中的实现是固定返回true
 						if (factory.supportsMethod(method)) {
+							// 如果是aop代理对象这里会获取目标对象的方法
 							Method methodToUse = AopUtils.selectInvocableMethod(method, context.getType(beanName));
+							// 通过Method对象创建ApplicationListener
 							ApplicationListener<?> applicationListener =
 									factory.createApplicationListener(beanName, targetType, methodToUse);
+							// 如果工厂创建出来的监听器属于ApplicationListenerMethodAdapter，则将context和evaluator赋值给监听器
 							if (applicationListener instanceof ApplicationListenerMethodAdapter) {
 								((ApplicationListenerMethodAdapter) applicationListener).init(context, this.evaluator);
 							}
+							// 添加到监听器集合
 							context.addApplicationListener(applicationListener);
 							break;
 						}

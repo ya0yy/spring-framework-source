@@ -12,11 +12,10 @@ import java.util.concurrent.TimeUnit;
  * @author yaoyy
  */
 @Component
-public class MyListener {
+public abstract class MyListener {
 
 	/**
-	 * 监听到事件并不是异步执的哦
-	 * @param event
+	 * 监听到事件并不是异步执的哦，如果需要异步执行可以手动通过api调用set线程池，或者使用@Async
 	 */
 	@Async
 	@EventListener

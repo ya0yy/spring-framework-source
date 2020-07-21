@@ -4,6 +4,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * 2020-02-11 22:45
@@ -15,7 +17,6 @@ import org.springframework.context.annotation.Scope;
 @ComponentScan("com.yao.cglib")
 public class App {
 
-	@Scope
 	@Bean
 	public Customer customer() {
 		return new Customer();

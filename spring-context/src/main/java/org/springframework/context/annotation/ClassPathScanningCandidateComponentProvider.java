@@ -419,7 +419,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			// 拼接classpath和 **/*.class
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
-			// 根据路径拿到所有符合的资源（文件）也就是（*.class）
+			// 根据路径拿到所有符合的资源（文件）也就是（*.class）,GenericApplicationContext
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -439,6 +439,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setResource(resource);
 							sbd.setSource(resource);
+							// 这里会判断该bd的beanClass是否是接口或者是否满足@Lookup
 							if (isCandidateComponent(sbd)) {
 								if (debugEnabled) {
 									logger.debug("Identified candidate component class: " + resource);

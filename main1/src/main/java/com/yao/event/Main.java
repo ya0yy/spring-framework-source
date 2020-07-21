@@ -3,6 +3,7 @@ package com.yao.event;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.*;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * 2020-04-03 01:07
@@ -11,7 +12,8 @@ import org.springframework.context.annotation.*;
  */
 @Configuration
 @ComponentScan
-public class Main implements ApplicationEventPublisherAware {
+@EnableAsync
+public abstract class Main implements ApplicationEventPublisherAware {
 
 	ApplicationEventPublisher publisher;
 

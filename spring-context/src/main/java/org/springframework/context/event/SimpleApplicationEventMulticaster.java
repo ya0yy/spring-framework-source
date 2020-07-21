@@ -131,6 +131,7 @@ public class SimpleApplicationEventMulticaster extends AbstractApplicationEventM
 	public void multicastEvent(final ApplicationEvent event, @Nullable ResolvableType eventType) {
 		// 解析事件类型，其实就是调用ResolvableTypeProvider接口的方法
 		ResolvableType type = (eventType != null ? eventType : resolveDefaultEventType(event));
+		// 注意：此处的线程池是需要开发者手动api调用 才能配置，一般如果需要异步调用的话使用@Async注解就可以了
 		Executor executor = getTaskExecutor();
 		// 遍历所有监听type类型的event事件的监听器，以listener event为传参，执行invokeListener方法
 		for (ApplicationListener<?> listener : getApplicationListeners(event, type)) {

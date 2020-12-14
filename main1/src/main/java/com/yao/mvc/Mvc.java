@@ -59,6 +59,7 @@ public class Mvc {
 		AnnotationConfigWebApplicationContext ac = new AnnotationConfigWebApplicationContext();
 		ac.register(Mvc.class);
 
+		// DispatchServlet是一个Servlet，并不是SpringContext，只是ServletContext中包含了一个SpringContext
 		return new DispatcherServlet(ac);
 	}
 

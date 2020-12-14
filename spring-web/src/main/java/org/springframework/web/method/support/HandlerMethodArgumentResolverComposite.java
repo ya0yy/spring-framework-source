@@ -134,6 +134,8 @@ public class HandlerMethodArgumentResolverComposite implements HandlerMethodArgu
 	private HandlerMethodArgumentResolver getArgumentResolver(MethodParameter parameter) {
 		HandlerMethodArgumentResolver result = this.argumentResolverCache.get(parameter);
 		if (result == null) {
+			// 遍历所有参数解析器，并存入缓存。注意，找到第一个支持该参数的的解析器就break
+			// 此处的解析器是由org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter#afterPropertiesSet方法添加进去
 			for (HandlerMethodArgumentResolver methodArgumentResolver : this.argumentResolvers) {
 				if (methodArgumentResolver.supportsParameter(parameter)) {
 					result = methodArgumentResolver;

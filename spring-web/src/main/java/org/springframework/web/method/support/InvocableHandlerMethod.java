@@ -162,10 +162,12 @@ public class InvocableHandlerMethod extends HandlerMethod {
 			if (args[i] != null) {
 				continue;
 			}
+			// 里面会遍历所有参数解析器然后调用supportsParameter方法，如果没有任何一个参数解析器支持该参数则返回false，下面抛出异常
 			if (!this.resolvers.supportsParameter(parameter)) {
 				throw new IllegalStateException(formatArgumentError(parameter, "No suitable resolver"));
 			}
 			try {
+				// 该方法里面会再次去获取支持parameter的参数解析器，因为上一步调用中做了缓存，所以此处不必担心性能问题
 				args[i] = this.resolvers.resolveArgument(parameter, mavContainer, request, this.dataBinderFactory);
 			}
 			catch (Exception ex) {

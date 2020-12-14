@@ -555,12 +555,17 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #FrameworkServlet(WebApplicationContext)
 	 * @see #setContextClass
 	 * @see #setContextConfigLocation
+	 *
+	 * 此方法会在Servlet服务器启动时被调用
+	 * HttpServletBean中实现了Servlet规范的init方法，在Servlet容器(Servlet规范的web服务器)启动时，会调用init方法，见{@link HttpServletBean#init()}
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
+		// 从ServletContext中拿到ac，该方法第一次被调用时候应该是null
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
+		// 此处的webApplicationContext就是在main方法中手动new并放DispatchServlet中的
 		if (this.webApplicationContext != null) {
 			// A context instance was injected at construction time -> use it
 			wac = this.webApplicationContext;
@@ -670,6 +675,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	}
 
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac) {
+		// 生成id，无关紧要
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
 			// The application context id is still set to its original default value
 			// -> assign a more useful id based on available information
@@ -678,6 +684,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			}
 			else {
 				// Generate default id...
+				// 有个小细节，这里用SpringMVC的contextPath成了容器id，所以是否意味着可以有多个webSpring的容器存在于Servlet之中呢？
 				wac.setId(ConfigurableWebApplicationContext.APPLICATION_CONTEXT_ID_PREFIX +
 						ObjectUtils.getDisplayString(getServletContext().getContextPath()) + '/' + getServletName());
 			}
@@ -686,6 +693,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		wac.setServletContext(getServletContext());
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
+		// 添加ContextRefreshedEven监听器，搞不懂为什么要用SourceFilteringListener包一层。（最终事件还是会交给ContextRefreshListener来处理）
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 
 		// The wac environment's #initPropertySources will be called in any case when the context

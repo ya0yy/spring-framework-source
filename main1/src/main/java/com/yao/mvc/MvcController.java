@@ -36,6 +36,11 @@ public class MvcController {
 		return user  + "======" + nickname;
 	}
 
+	@GetMapping("/throw_exp.do")
+	public void throwExp() {
+		throw new RuntimeException();
+	}
+
 	@ModelAttribute(name = "nickname")
 	public String getNickname(Model model) {
 		return "tom";

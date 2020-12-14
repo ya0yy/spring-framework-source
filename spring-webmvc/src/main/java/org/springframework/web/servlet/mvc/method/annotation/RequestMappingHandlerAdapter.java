@@ -552,6 +552,7 @@ public class RequestMappingHandlerAdapter extends AbstractHandlerMethodAdapter
 	}
 
 
+	// InitializingBean的生命周期，在第七次后置处理器之后，也就是initMethod方法之后
 	@Override
 	public void afterPropertiesSet() {
 		// Do this first, it may add ResponseBody advice beans

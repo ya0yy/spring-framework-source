@@ -4,10 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.AbstractController;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -17,9 +24,9 @@ import java.util.Map;
  *
  * @author yaoyy
  */
-@RestController
+@RestController("/mvc")
 @RequestMapping(value = "/test")
-public class MvcController {
+public class MvcController extends AbstractController {
 
 	@Autowired
 	public void xx() {
@@ -31,8 +38,14 @@ public class MvcController {
 		System.out.println("MvcController构造");
 	}
 
+	@Override
+	protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		System.err.println("命中！");
+		return null;
+	}
+
 	@GetMapping("/test.do")
-	public String hello(User user, @ModelAttribute(name = "nickname") String nickname) {
+	public String hello(@Validated User user, @ModelAttribute(name = "nickname") String nickname) {
 		return user  + "======" + nickname;
 	}
 
@@ -57,7 +70,8 @@ public class MvcController {
 		binder.setDisallowedFields("nickname", "name");
 	}
 
-	static class User {
+	public static class User {
+		@NotNull(message = "name不能为null")
 		private String name;
 		private String nickname;
 

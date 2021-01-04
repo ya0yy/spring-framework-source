@@ -4,6 +4,7 @@ import com.sun.javafx.runtime.SystemProperties;
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
+import org.hibernate.validator.HibernateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -13,11 +14,14 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
 import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.FrameworkServlet;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.HttpServletBean;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
@@ -28,6 +32,15 @@ import java.util.List;
  * 2020-02-23 23:36
  *
  * 0配置mvc
+ *
+ *
+ *
+ * springmvc整合tomcat流程分析
+ * tomcat启动时候，servlet3.0规范会扫描javax.servlet.ServletContainerInitializer的spi文件，然后获取类上面的@HandlerType注解所标注的
+ * 类型的所有class，执行onStartup方法。
+ * 此时可以在onStartup中将SpringMvc的核心DispatcherServlet初始化，然后放到ServletContext中
+ * 当ServletContext容器初始化DispatcherServlet时，会调用它所覆写的init方法{@link HttpServletBean#init()}，
+ * 然后会执行到子类的{@link FrameworkServlet#initServletBean()}，在这个方法中初始化了Spring web context环境
  *
  * @author yaoyy
  */
@@ -149,7 +162,9 @@ public class Mvc {
 
 			@Override
 			public Validator getValidator() {
-				return null;
+				LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+				localValidatorFactoryBean.setProviderClass(HibernateValidator.class);
+				return localValidatorFactoryBean;
 			}
 
 			@Override

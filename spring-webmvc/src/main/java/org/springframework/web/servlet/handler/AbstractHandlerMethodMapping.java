@@ -266,26 +266,31 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #getMappingForMethod
 	 */
 	protected void detectHandlerMethods(Object handler) {
+		// 对字符串做处理
 		Class<?> handlerType = (handler instanceof String ?
 				obtainApplicationContext().getType((String) handler) : handler.getClass());
 
 		if (handlerType != null) {
+			// 拿到目标（如果被代理）
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
+			// 遍历userType中所有的method，具体是什么条件的method进去看MethodIntrospector::selectMethods的逻辑。。
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
-						try {
-							return getMappingForMethod(method, userType);
-						}
-						catch (Throwable ex) {
-							throw new IllegalStateException("Invalid mapping on handler class [" +
-									userType.getName() + "]: " + method, ex);
-						}
-					});
+					   try {
+						   return getMappingForMethod(method, userType);
+					   }
+					   catch (Throwable ex) {
+						   throw new IllegalStateException("Invalid mapping on handler class [" +
+								   userType.getName() + "]: " + method, ex);
+					   }
+				   });
 			if (logger.isTraceEnabled()) {
 				logger.trace(formatMappings(userType, methods));
 			}
 			methods.forEach((method, mapping) -> {
+				// 这里检查是否是奇葩方法（私有的静态的被代理的等）
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				// 注册
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}
@@ -363,6 +368,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
 		// 解析路径
 		String lookupPath = getUrlPathHelper().getLookupPathForRequest(request);
+		// 在request域中暂存路径
 		request.setAttribute(LOOKUP_PATH, lookupPath);
 		// 读锁
 		this.mappingRegistry.acquireReadLock();
@@ -435,7 +441,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 		for (T mapping : mappings) {
 			// 里面会判断本次request是否匹配这个RequestMappingInfo，判断条件就是请求是否和@RequestMapping里的属性值匹配
 			T match = getMatchingMapping(mapping, request);
-			// 为null就是匹配，封装成Match添加进matches
+			// 不为null就是匹配，封装成Match添加进matches
 			if (match != null) {
 				matches.add(new Match(match, this.mappingRegistry.getMappings().get(mapping)));
 			}
@@ -600,13 +606,18 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			this.readWriteLock.readLock().unlock();
 		}
 
+		// 一般来说mapping是RequestMappingInfo，handler是controller的名称字符串形式），method是具体的方法
 		public void register(T mapping, Object handler, Method method) {
 			this.readWriteLock.writeLock().lock();
 			try {
+				// 里面仅仅是new HandlerMethod(handler, method)
 				HandlerMethod handlerMethod = createHandlerMethod(handler, method);
+				// 校验是否存在
 				validateMethodMapping(handlerMethod, mapping);
+				// mapping一般是RequestMappingInfo类型，handlerMethod包含controller与method
 				this.mappingLookup.put(mapping, handlerMethod);
 
+				// 添加到urlLookup 用请求路径作为映射
 				List<String> directUrls = getDirectUrls(mapping);
 				for (String url : directUrls) {
 					this.urlLookup.add(url, mapping);
@@ -614,10 +625,13 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 				String name = null;
 				if (getNamingStrategy() != null) {
+					// 获取名称（若没有在@RequestMapping中的name指定，则默认的规则是类名首字母#方法名）
 					name = getNamingStrategy().getName(handlerMethod, mapping);
+					// 添加到nameLookup，用name映射
 					addMappingName(name, handlerMethod);
 				}
 
+				// 跨域配置，对应注解@CrossOrigin，意思是每个handlerMethod都对应一个跨域配置？？
 				CorsConfiguration corsConfig = initCorsConfiguration(handler, method, mapping);
 				if (corsConfig != null) {
 					this.corsLookup.put(handlerMethod, corsConfig);

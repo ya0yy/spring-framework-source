@@ -526,7 +526,9 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// 这里是初始化spring web context的入口，里面完成了spring context创建的所有流程
 			this.webApplicationContext = initWebApplicationContext();
+			// 空方法
 			initFrameworkServlet();
 		}
 		catch (ServletException | RuntimeException ex) {
@@ -660,6 +662,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 					"': custom WebApplicationContext class [" + contextClass.getName() +
 					"] is not of type ConfigurableWebApplicationContext");
 		}
+		// 使反射创建spring web context
 		ConfigurableWebApplicationContext wac =
 				(ConfigurableWebApplicationContext) BeanUtils.instantiateClass(contextClass);
 
@@ -704,8 +707,10 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 			((ConfigurableWebEnvironment) env).initPropertySources(getServletContext(), getServletConfig());
 		}
 
+		// 空方法，留给子类实现吧
 		postProcessWebApplicationContext(wac);
 		applyInitializers(wac);
+		// spring refresh
 		wac.refresh();
 	}
 
@@ -751,6 +756,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #createWebApplicationContext
 	 * @see #postProcessWebApplicationContext
 	 * @see ConfigurableApplicationContext#refresh()
+	 * 执行在DispatcherServlt的初始化参数中指定的globalInitializerClasses
 	 */
 	protected void applyInitializers(ConfigurableApplicationContext wac) {
 		String globalClassNames = getServletContext().getInitParameter(ContextLoader.GLOBAL_INITIALIZER_CLASSES_PARAM);

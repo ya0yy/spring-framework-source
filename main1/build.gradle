@@ -41,6 +41,10 @@ dependencies {
     compile ("org.apache.tomcat.embed:tomcat-embed-core:${tomcatVersion}")
     compile group: 'org.apache.tomcat.embed', name: 'tomcat-embed-logging-juli', version: '8.5.0'
 
+    // undertow
+    compile ("io.undertow:undertow-core:${undertowVersion}")
+    compile ("io.undertow:undertow-servlet:${undertowVersion}")
+
     // jetty
     compile ("org.eclipse.jetty:jetty-server:${jettyVersion}")
     compile ("org.eclipse.jetty:jetty-annotations:${jettyVersion}")
@@ -49,6 +53,11 @@ dependencies {
     compile group: 'org.mybatis', name: 'mybatis-spring', version: '2.0.4'
     compile group: 'org.mybatis', name: 'mybatis', version: '3.5.4'
     compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.19'
+
+    // hibernate validate
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.1.7.Final'
+    compile group: 'org.apache.tomcat', name: 'tomcat-el-api', version: '8.5.14'
+    compile group: 'org.apache.tomcat', name: 'tomcat-jasper-el', version: '8.5.14'
 
     // log
 //    compile group: 'log4j', name: 'log4j', version: '1.2.17'

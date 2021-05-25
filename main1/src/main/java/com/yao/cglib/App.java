@@ -18,13 +18,13 @@ import org.springframework.core.annotation.Order;
 public class App {
 
 	@Bean
-	public Customer customer() {
-		return new Customer();
-	}
-
-	@Bean
 	public CItem cItem() {
 		customer();
 		return new CItem();
+	}
+
+	@Bean
+	public Customer customer() {
+		return new Customer();
 	}
 }

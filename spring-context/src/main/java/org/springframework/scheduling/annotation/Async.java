@@ -56,6 +56,7 @@ import java.lang.annotation.Target;
 public @interface Async {
 
 	/**
+	 * 可以指定spring容器中线程池的名称 {@link org.springframework.aop.interceptor.AsyncExecutionAspectSupport#determineAsyncExecutor}
 	 * A qualifier value for the specified asynchronous operation(s).
 	 * <p>May be used to determine the target executor to be used when executing
 	 * the asynchronous operation(s), matching the qualifier value (or the bean

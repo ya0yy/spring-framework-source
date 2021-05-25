@@ -385,6 +385,7 @@ public abstract class AbstractAspectJAdvice implements Advice, AspectJPrecedence
 
 		int numUnboundArgs = this.parameterTypes.length;
 		Class<?>[] parameterTypes = this.aspectJAdviceMethod.getParameterTypes();
+		// 这里判断了内置参数，也就是说只有这三个类型的参数可以绑定，否则就视为未绑定的参数
 		if (maybeBindJoinPoint(parameterTypes[0]) || maybeBindProceedingJoinPoint(parameterTypes[0]) ||
 				maybeBindJoinPointStaticPart(parameterTypes[0])) {
 			numUnboundArgs--;

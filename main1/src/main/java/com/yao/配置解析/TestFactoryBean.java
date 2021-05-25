@@ -13,11 +13,11 @@ import java.util.List;
  * @author yaoyy
  */
 @Component
-public class TestFactoryBean implements FactoryBean {
+public class TestFactoryBean implements FactoryBean<Object> {
 
 	@Override
 	public Object getObject() throws Exception {
-		return new ArrayList(8);
+		return new ArrayList<>(8);
 	}
 
 	@Override

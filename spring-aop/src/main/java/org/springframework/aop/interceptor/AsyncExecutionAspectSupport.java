@@ -161,21 +161,27 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 	 */
 	@Nullable
 	protected AsyncTaskExecutor determineAsyncExecutor(Method method) {
+		// 首先从缓存中lookup
 		AsyncTaskExecutor executor = this.executors.get(method);
 		if (executor == null) {
 			Executor targetExecutor;
+			// 从@Async注解中获取value
 			String qualifier = getExecutorQualifier(method);
+			// 通过value从容器中找到Executor，注意只会查找Executor类型的bean
 			if (StringUtils.hasLength(qualifier)) {
 				targetExecutor = findQualifiedExecutor(this.beanFactory, qualifier);
 			}
 			else {
+				// 找不到就使用默认的Executor，默认的Executor在构造器里传入，具体要结合get()方法来看
 				targetExecutor = this.defaultExecutor.get();
 			}
 			if (targetExecutor == null) {
 				return null;
 			}
+			// 转换为spring自己的Executor类型
 			executor = (targetExecutor instanceof AsyncListenableTaskExecutor ?
 					(AsyncListenableTaskExecutor) targetExecutor : new TaskExecutorAdapter(targetExecutor));
+			// 放入缓存
 			this.executors.put(method, executor);
 		}
 		return executor;
@@ -230,11 +236,13 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 				// Search for TaskExecutor bean... not plain Executor since that would
 				// match with ScheduledExecutorService as well, which is unusable for
 				// our purposes here. TaskExecutor is more clearly designed for it.
+				// 这里意思是说不要直接匹配Executor.class，因为ScheduledExecutorService有可能也用到Executor.class
 				return beanFactory.getBean(TaskExecutor.class);
 			}
 			catch (NoUniqueBeanDefinitionException ex) {
 				logger.debug("Could not find unique TaskExecutor bean", ex);
 				try {
+					// 如果有多个bean就使用名为taskExecutor的bean
 					return beanFactory.getBean(DEFAULT_TASK_EXECUTOR_BEAN_NAME, Executor.class);
 				}
 				catch (NoSuchBeanDefinitionException ex2) {
@@ -246,6 +254,7 @@ public abstract class AsyncExecutionAspectSupport implements BeanFactoryAware {
 				}
 			}
 			catch (NoSuchBeanDefinitionException ex) {
+				// 如果找不到的话就和上面的逻辑一样
 				logger.debug("Could not find default TaskExecutor bean", ex);
 				try {
 					return beanFactory.getBean(DEFAULT_TASK_EXECUTOR_BEAN_NAME, Executor.class);

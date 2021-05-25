@@ -18,14 +18,13 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
-import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.servlet.FrameworkServlet;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.HttpServletBean;
+import org.springframework.web.servlet.*;
 import org.springframework.web.servlet.config.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
 
 import javax.servlet.Servlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -48,7 +47,6 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 public class Mvc {
-
 
 	public static void main(String[] args) throws Exception {
 		Tomcat tomcat = new Tomcat();
@@ -106,7 +104,7 @@ public class Mvc {
 
 			@Override
 			public void addInterceptors(InterceptorRegistry registry) {
-
+				registry.addInterceptor(new HandlerInterceptor(){});
 			}
 
 			@Override

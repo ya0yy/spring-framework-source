@@ -63,6 +63,7 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) {
+		// 忽略aop的bean，猜想就是aop的那些组件
 		if (this.advisor == null || bean instanceof AopInfrastructureBean) {
 			// Ignore AOP infrastructure such as scoped proxies.
 			return bean;
@@ -82,6 +83,7 @@ public abstract class AbstractAdvisingBeanPostProcessor extends ProxyProcessorSu
 			}
 		}
 
+		// 该方法里判断了是否需要代理bean，实质上是一个目标@Async注解的切点判断的
 		if (isEligible(bean, beanName)) {
 			ProxyFactory proxyFactory = prepareProxyFactory(bean, beanName);
 			if (!proxyFactory.isProxyTargetClass()) {

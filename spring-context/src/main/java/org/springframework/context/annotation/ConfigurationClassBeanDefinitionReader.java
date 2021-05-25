@@ -182,6 +182,7 @@ class ConfigurationClassBeanDefinitionReader {
 	@SuppressWarnings("deprecation")  // for RequiredAnnotationBeanPostProcessor.SKIP_REQUIRED_CHECK_ATTRIBUTE
 	private void loadBeanDefinitionsForBeanMethod(BeanMethod beanMethod) {
 		ConfigurationClass configClass = beanMethod.getConfigurationClass();
+		// metadata是方法的元信息
 		MethodMetadata metadata = beanMethod.getMetadata();
 		String methodName = metadata.getMethodName();
 
@@ -194,14 +195,17 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 获取到方法的@Bean注解信息
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
 		// Consider name and any aliases
 		List<String> names = new ArrayList<>(Arrays.asList(bean.getStringArray("name")));
+		// 如果没有指定name就使用方法名
 		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);
 
 		// Register aliases even when overridden
+		// 注册别名
 		for (String alias : names) {
 			this.registry.registerAlias(beanName, alias);
 		}
@@ -209,6 +213,7 @@ class ConfigurationClassBeanDefinitionReader {
 		// Has this effectively been overridden before (e.g. via XML)?
 		// 是否要被现有的覆盖
 		if (isOverriddenByExistingDefinition(beanMethod, beanName)) {
+			// 如果bean name与bean方法所属的配置类的bean name一样则抛出异常
 			if (beanName.equals(beanMethod.getConfigurationClass().getBeanName())) {
 				throw new BeanDefinitionStoreException(beanMethod.getConfigurationClass().getResource().getDescription(),
 						beanName, "Bean name derived from @Bean method '" + beanMethod.getMetadata().getMethodName() +
@@ -217,6 +222,7 @@ class ConfigurationClassBeanDefinitionReader {
 			return;
 		}
 
+		// 根据配置类与@Bean方法的metadata创建ConfigurationClassBeanDefinition
 		ConfigurationClassBeanDefinition beanDef = new ConfigurationClassBeanDefinition(configClass, metadata);
 		beanDef.setResource(configClass.getResource());
 		beanDef.setSource(this.sourceExtractor.extractSource(metadata, configClass.getResource()));
@@ -224,6 +230,7 @@ class ConfigurationClassBeanDefinitionReader {
 		if (metadata.isStatic()) {
 			// static @Bean method
 			if (configClass.getMetadata() instanceof StandardAnnotationMetadata) {
+				// 注意，静态的@Bean方法会set beanClass为所属配置类，而非静态的@Bean方法则不会
 				beanDef.setBeanClass(((StandardAnnotationMetadata) configClass.getMetadata()).getIntrospectedClass());
 			}
 			else {
@@ -233,25 +240,32 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 		else {
 			// instance @Bean method
+			// 工厂bean name，（如@Configuration类A下有一个@Bean return new B()，那么A就是b的工厂bean）
 			beanDef.setFactoryBeanName(configClass.getBeanName());
+			// 唯一工厂方法名
 			beanDef.setUniqueFactoryMethodName(methodName);
 		}
 
+		// 工厂方法，也就是@Bean的那个方法
 		if (metadata instanceof StandardMethodMetadata) {
 			beanDef.setResolvedFactoryMethod(((StandardMethodMetadata) metadata).getIntrospectedMethod());
 		}
 
+		// 默认的自动装配模式
 		beanDef.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_CONSTRUCTOR);
 		beanDef.setAttribute(org.springframework.beans.factory.annotation.RequiredAnnotationBeanPostProcessor.
 				SKIP_REQUIRED_CHECK_ATTRIBUTE, Boolean.TRUE);
 
+		// 处理一下bean的通用的注解（@Lazy、@Primary等等）
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(beanDef, metadata);
 
+		// 这个自动装配好像是xml里的那个自动装配
 		Autowire autowire = bean.getEnum("autowire");
 		if (autowire.isAutowire()) {
 			beanDef.setAutowireMode(autowire.value());
 		}
 
+		// 允许被装配
 		boolean autowireCandidate = bean.getBoolean("autowireCandidate");
 		if (!autowireCandidate) {
 			beanDef.setAutowireCandidate(false);
@@ -295,6 +309,8 @@ class ConfigurationClassBeanDefinitionReader {
 
 	/**
 	 * 是否被当前已经存在的bd所覆盖，return true表示不覆盖当前的，false表示覆盖当前
+	 * true 跳过本bd加载
+	 * false 不跳过
 	 */
 	protected boolean isOverriddenByExistingDefinition(BeanMethod beanMethod, String beanName) {
 		if (!this.registry.containsBeanDefinition(beanName)) {
@@ -308,9 +324,11 @@ class ConfigurationClassBeanDefinitionReader {
 		// preserve the existing bean definition.
 		if (existingBeanDef instanceof ConfigurationClassBeanDefinition) {
 			ConfigurationClassBeanDefinition ccbd = (ConfigurationClassBeanDefinition) existingBeanDef;
+			// 这里判断的是是否两个bean都出自于同一个类的，可能存在两个@Configuration中有相同名称的@Bean方法（注意，本方法只针对于BeanMethod）
 			if (ccbd.getMetadata().getClassName().equals(
 					beanMethod.getConfigurationClass().getMetadata().getClassName())) {
 				if (ccbd.getFactoryMethodMetadata().getMethodName().equals(ccbd.getFactoryMethodName())) {
+					// 如果是方法重载，则set NonUniqueFactoryMethodName，注意只是set名字
 					ccbd.setNonUniqueFactoryMethodName(ccbd.getFactoryMethodMetadata().getMethodName());
 				}
 				return true;
@@ -322,7 +340,7 @@ class ConfigurationClassBeanDefinitionReader {
 
 		// A bean definition resulting from a component scan can be silently overridden
 		// by an @Bean method, as of 4.2...
-		// 如果当前存在的是被扫描出来的，就覆盖当前bd
+		// 如果当前存在的是被扫描出来的，就不跳过本bd的加载（在register中，最后会覆盖existingBeanDef）
 		if (existingBeanDef instanceof ScannedGenericBeanDefinition) {
 			return false;
 		}

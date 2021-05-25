@@ -7,6 +7,8 @@ import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 2020-02-15 23:32
  *
@@ -41,8 +43,8 @@ public class AspectClass {
 		return 555;
 	}
 
-	@Before(within)
-	public void doAccessCheck() {
+	@Around(execution)
+	public void doAccessCheck(ProceedingJoinPoint point) {
 		System.out.println("before");
 	}
 }

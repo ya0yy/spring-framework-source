@@ -29,10 +29,7 @@ dependencies {
     compile group: 'cglib', name: 'cglib-nodep', version: '2.2'
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.5'
 
-//    compile (project(":spring-context"))
-
     compile (project(":spring-webmvc"))
-//    compile (project(":spring-context-support"))
     compile (project(":spring-jdbc"))
 
     compile ('javax.servlet:javax.servlet-api:3.1.0')

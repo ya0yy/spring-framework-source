@@ -343,7 +343,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		do {
 			// 解析所有目前存在于BeanDefinitionMap中的配置类，里面包括了扫描
 			parser.parse(candidates);
-			// 验证配置类和@Bean方法（是否是final或static）
+			// 验证配置类和@Bean方法（是否是final）
 			parser.validate();
 
 			// 拿到所有解析到的配置类

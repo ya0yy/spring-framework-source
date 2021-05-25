@@ -432,17 +432,20 @@ class ConstructorResolver {
 
 		// @Bean方法的工厂bean是所属的配置类，这里说的并不是那个生产bean接口
 		String factoryBeanName = mbd.getFactoryBeanName();
+		// 在org/springframework/context/annotation/ConfigurationClassBeanDefinitionReader.java:230中，
+		// 判断了factoryBeanMethod是否为静态，如果是静态的则不回在bd中set factoryBeanMethod，所以这里仅仅根据factoryBeanName的值来判断factoryMethod是否是静态方法是可行的
 		if (factoryBeanName != null) {
 			// 如果所属配置类的@Bean方法生产的是自己的类型则抛出异常
 			if (factoryBeanName.equals(beanName)) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"factory-bean reference points back to the same bean definition");
 			}
-			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			// 如果该bd是单例的并且单例池已经有了该beanName的bean，则抛异常
+			factoryBean = this.beanFactory.getBean(factoryBeanName);
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
+			// 所属配置类的class
 			factoryClass = factoryBean.getClass();
 			isStatic = false;
 		}
@@ -500,9 +503,11 @@ class ConstructorResolver {
 					candidateList = Collections.singletonList(factoryMethodToUse);
 				}
 			}
-			// 如果还拿不到，就从所属配置类拿到所有工厂方法(注解通过@Bean判断，xml通过配置里的所有factory-method判断)
+			// 如果工厂方法不唯一，就从所属配置类拿到所有工厂方法(注解通过@Bean判断，xml通过配置里的所有factory-method判断)
+			// 注: org/springframework/context/annotation/ConfigurationClassBeanDefinitionReader.java:331
 			if (candidateList == null) {
 				candidateList = new ArrayList<>();
+				// 获取到配置类的所有方法，遍历判断，其实isFactoryMethod方法中也仅仅只是判断了方法名称
 				Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
 				for (Method candidate : rawCandidates) {
 					if (Modifier.isStatic(candidate.getModifiers()) == isStatic && mbd.isFactoryMethod(candidate)) {
@@ -511,7 +516,7 @@ class ConstructorResolver {
 				}
 			}
 
-			// 候选的工厂方法只有一个 && 没有额外参数 && 没有可选的构造器参数（xml配置的构造器参数）
+			// 候选的工厂方法只有一个的情况 && 没有额外参数 && 没有可选的构造器参数（xml配置的构造器参数）
 			if (candidateList.size() == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
 				// 拿到工厂方法
 				Method uniqueCandidate = candidateList.get(0);
@@ -531,11 +536,12 @@ class ConstructorResolver {
 			}
 
 			// 如果有多个候选的工厂方法
-			// TODO: 2020/3/10 @Bean方法实例化bean未完
 			Method[] candidates = candidateList.toArray(new Method[0]);
+			// 先排个序，根据方法的访问权限
 			AutowireUtils.sortFactoryMethods(candidates);
 
 			ConstructorArgumentValues resolvedValues = null;
+			// 是否自动装配。注意@Bean的bd默认模式就是 AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR
 			boolean autowiring = (mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
 			int minTypeDiffWeight = Integer.MAX_VALUE;
 			Set<Method> ambiguousFactoryMethods = null;
@@ -547,6 +553,7 @@ class ConstructorResolver {
 			else {
 				// We don't have arguments passed in programmatically, so we need to resolve the
 				// arguments specified in the constructor arguments held in the bean definition.
+				// 这个一般是在xml中手动指定的
 				if (mbd.hasConstructorArgumentValues()) {
 					ConstructorArgumentValues cargs = mbd.getConstructorArgumentValues();
 					resolvedValues = new ConstructorArgumentValues();
@@ -559,6 +566,7 @@ class ConstructorResolver {
 
 			LinkedList<UnsatisfiedDependencyException> causes = null;
 
+			// 猜想是根据容器中的bean与方法参数与一些算法，选出一个最合适的beanFactoryMethod，参考ScanBD的构造器推断
 			for (Method candidate : candidates) {
 				Class<?>[] paramTypes = candidate.getParameterTypes();
 

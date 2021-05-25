@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
  */
 public class MyEvent<T> extends ApplicationEvent implements ResolvableTypeProvider{
 
+	public static final long serialVersionUID = 1L;
+
 	public MyEvent(T entity) {
 		super(entity);
 	}

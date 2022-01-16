@@ -22,9 +22,9 @@ public class CGLibDemo {
 		enhancer.setCallback(new TargetInterceptor());
 		TargetObject targetObject2=(TargetObject)enhancer.create();
 
-		System.out.println(targetObject2);
-		System.out.println(targetObject2.method1("mmm1"));
-		System.out.println(targetObject2.method2(100));
+//		System.out.println(targetObject2);
+//		System.out.println(targetObject2.method1("mmm1"));
+//		System.out.println(targetObject2.method2(100));
 		System.out.println(targetObject2.method3(200));
 	}
 }

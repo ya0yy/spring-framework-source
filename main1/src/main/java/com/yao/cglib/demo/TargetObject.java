@@ -12,10 +12,13 @@ public class TargetObject {
 	}
 
 	public int method2(int count) {
+		System.out.println("method2");
 		return count;
 	}
 
 	public int method3(int count) {
+		this.method2(count);
+		System.out.println("method3");
 		return count;
 	}
 

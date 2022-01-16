@@ -747,6 +747,7 @@ class CglibAopProxy implements AopProxy, Serializable {
 		@Override
 		protected Object invokeJoinpoint() throws Throwable {
 			if (this.methodProxy != null) {
+//				return methodProxy.invokeSuper(proxy, this.arguments);
 				return this.methodProxy.invoke(this.target, this.arguments);
 			}
 			else {

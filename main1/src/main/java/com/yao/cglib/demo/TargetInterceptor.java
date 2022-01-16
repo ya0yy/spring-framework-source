@@ -30,7 +30,7 @@ public class TargetInterceptor implements MethodInterceptor {
 							MethodProxy proxy) throws Throwable {
 		System.out.println("调用前");
 		Object result = proxy.invokeSuper(obj, params);
-		System.out.println(" 调用后"+result);
+		System.out.println("调用后"+result);
 		return result;
 	}
 

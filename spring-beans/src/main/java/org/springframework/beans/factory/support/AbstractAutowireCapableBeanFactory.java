@@ -657,6 +657,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			//
 			// aop的循环依赖其实是目标对象的循环依赖，并不是aop的代理对象互相依赖，代理对象中有目标对象的引用
 			//
+			//
+			// 这里存在一个aop的循环依赖问题，当A->B->C->A时
+			// 情况一：如果A需要生成aop代理对象，创建A时，会先去创建B，创建B时会先创建C，创建C时会从this.earlySingletonObjects中拿到在A的早期
+			// 对象（该对象是在创建A时放进去的，此时还是一个A的原始对象，即还未生成aop代理对象），此时依赖填充结束，到第8次后置处理器执行时，
+			// 会生成A的代理对象，而此时已经创建完成的C中依赖的仍然是A的原始对象，故这里要做一个exposedObject == bean的判断，避免错误
+			// 的使用bean。如果打开了allowRawInjectionDespiteWrapping，则发生这种情况时不会抛出异常，而是使用原始bean当作最终的
+			// 单例bean使用。
+			// 情况二：还有一种情况是该依赖关系中A不需要创建aop对象，B需要创建aop对象，在给A属性填充时先去创建B，在填充B时创建了C，到了B的第8次后置
+			// 处理器，给B创建了aop代理对象，由于此时还是在A的创建生命周期中，所以此时是获取不到B的早期对象的，所以earlySingletonReference
+			// 为null，就没有情况一中的问题，下面就是将B交给A，A完成属性填充，至此这个循环依赖关系的三个bean已经创建完成
 			if (earlySingletonReference != null) {
 				// exposedObject如果等于bean说明在initializeBean方法中并未生成代理对象（可能在循环依赖的时候已经生成过了），所以将earlySingletonReference的值赋值给exposedObject，
 				// 因为earlySingletonReference可能是被aop过的，其实这里有点歧义，因为有一种情况是该bean根本就不需要aop，而这种情况就不需要取earlySingletonReference
@@ -1456,7 +1466,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean continueWithPropertyPopulation = true;
 
 		// 是否需要属性注入，Spring默认为true
-		// 第四次后置处理器，判断是否属性填充
+		// 第四次后置处理器，判断是否属性填充，如果不需要属性填充则直接return了，不会进入到第五次后置处理器
 		if (!mbd.isSynthetic() && hasInstantiationAwareBeanPostProcessors()) {
 			for (BeanPostProcessor bp : getBeanPostProcessors()) {
 				if (bp instanceof InstantiationAwareBeanPostProcessor) {

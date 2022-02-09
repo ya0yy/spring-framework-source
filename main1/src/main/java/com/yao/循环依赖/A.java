@@ -2,6 +2,8 @@ package com.yao.循环依赖;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.annotation.Order;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,5 +26,9 @@ public class A {
 
 	public A() {
 		System.out.println("A");
+	}
+//	@Async
+	public String hello() {
+		return "d hello";
 	}
 }

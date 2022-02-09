@@ -1,6 +1,5 @@
 package com.yao.mvc;
 
-import com.sun.javafx.runtime.SystemProperties;
 import org.apache.catalina.*;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;

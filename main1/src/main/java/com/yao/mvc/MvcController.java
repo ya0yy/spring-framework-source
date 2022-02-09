@@ -10,6 +10,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -37,8 +38,8 @@ public class MvcController extends AbstractController {
 		return null;
 	}
 
-	@GetMapping("/test.do")
-	public String hello(@Validated User user, @ModelAttribute(name = "nickname") String nickname) {
+	@PostMapping("/test.do")
+	public String hello(@Valid User user, @ModelAttribute(name = "nickname") String nickname) {
 		return user  + "======" + nickname;
 	}
 
@@ -52,6 +53,21 @@ public class MvcController extends AbstractController {
 		return "tom";
 	}
 
+	/**
+	 * 当controller中的handlerMethod执行抛出异常时，会优先寻找本controller的@ExceptionHandler方法，如果没有找到，
+	 * 则会去符合条件的ControllerAdvice中找
+	 * {@link org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver#getExceptionHandlerMethod(org.springframework.web.method.HandlerMethod, java.lang.Exception)}
+	 * ControllerAdvice中的ExceptionHandler会预先解析，而本类中的ExceptionHandler则是抛出异常时事实解析
+	 */
+	@ExceptionHandler
+	public String localExHandler(Exception e) {
+		throw new IllegalStateException("");
+//		return "local handler!";
+	}
+	@ExceptionHandler(IllegalStateException.class)
+	public String IllegalStateExceptionHandler(Exception e) {
+		return "捕获: " + e.getMessage();
+	}
 
 	/**
 	 * 其实initBinder类似一个Controller级别的参数解析器

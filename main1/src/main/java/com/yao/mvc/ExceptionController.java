@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ExceptionController {
 
 	@ExceptionHandler(Exception.class)
-	public void testHandler() {
+	public void testHandler(Exception e) {
 		System.out.println("say handler exception");
 	}
 }

@@ -60,6 +60,7 @@ public class ExceptionHandlerMethodResolver {
 	 * @param handlerType the type to introspect
 	 */
 	public ExceptionHandlerMethodResolver(Class<?> handlerType) {
+		// 获取handlerType中所有被标注为@ExceptionHandler的方法，保存到this.mappedMethods中，如果一个异常有多个method方法，则会抛出异常
 		for (Method method : MethodIntrospector.selectMethods(handlerType, EXCEPTION_HANDLER_METHODS)) {
 			for (Class<? extends Throwable> exceptionType : detectExceptionMappings(method)) {
 				addExceptionMapping(exceptionType, method);
@@ -83,6 +84,7 @@ public class ExceptionHandlerMethodResolver {
 				}
 			}
 		}
+		// 异常处理器参数最少要有一个Throwable的派生
 		if (result.isEmpty()) {
 			throw new IllegalStateException("No exception types mapped to " + method);
 		}
@@ -168,6 +170,7 @@ public class ExceptionHandlerMethodResolver {
 			}
 		}
 		if (!matches.isEmpty()) {
+			// 如果有多个匹配项目按深度匹配，具体看ExceptionDepthComparator的规则，找到最佳的异常处理器
 			matches.sort(new ExceptionDepthComparator(exceptionType));
 			return this.mappedMethods.get(matches.get(0));
 		}

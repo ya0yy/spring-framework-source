@@ -457,11 +457,16 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			handlerType = handlerMethod.getBeanType();
 			ExceptionHandlerMethodResolver resolver = this.exceptionHandlerCache.get(handlerType);
 			if (resolver == null) {
+				// 解析handlerType中所有的ExceptionHandler方法，缓存为ex type->method的映射
 				resolver = new ExceptionHandlerMethodResolver(handlerType);
 				this.exceptionHandlerCache.put(handlerType, resolver);
 			}
+			// 根据现有异常具体找出ExceptionHandler
 			Method method = resolver.resolveMethod(exception);
 			if (method != null) {
+				// 封装为ServletInvocableHandlerMethod返回，注意这是一个handlerMethod
+				// 也就是说异常处理器最后会像一个通常的handlerMethod正常执行，注意该handlerMethod所抛出的异常并不会像普通的handlerMethod
+				// 一样被ExceptionHandler捕获到，而是会在org.springframework.web.servlet.DispatcherServlet.processDispatchResult（处理handlerMethod的异常）处被抛出
 				return new ServletInvocableHandlerMethod(handlerMethod.getBean(), method);
 			}
 			// For advice applicability check below (involving base packages, assignable types
@@ -471,6 +476,7 @@ public class ExceptionHandlerExceptionResolver extends AbstractHandlerMethodExce
 			}
 		}
 
+		// 如果自己的controller中没有ExceptionHandler，则会去ControllerAdvice中寻找
 		for (Map.Entry<ControllerAdviceBean, ExceptionHandlerMethodResolver> entry : this.exceptionHandlerAdviceCache.entrySet()) {
 			ControllerAdviceBean advice = entry.getKey();
 			if (advice.isApplicableToBeanType(handlerType)) {

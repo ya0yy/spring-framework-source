@@ -159,6 +159,7 @@ public class ModelAttributeMethodProcessor implements HandlerMethodArgumentResol
 				if (!mavContainer.isBindingDisabled(name)) {
 					bindRequestParameters(binder, webRequest);
 				}
+				// 校验被标注为@Valid的参数
 				validateIfApplicable(binder, parameter);
 				if (binder.getBindingResult().hasErrors() && isBindExceptionRequired(binder, parameter)) {
 					throw new BindException(binder.getBindingResult());

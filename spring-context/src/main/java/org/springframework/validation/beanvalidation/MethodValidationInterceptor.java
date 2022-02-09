@@ -65,6 +65,8 @@ public class MethodValidationInterceptor implements MethodInterceptor {
 	 * Create a new MethodValidationInterceptor using a default JSR-303 validator underneath.
 	 */
 	public MethodValidationInterceptor() {
+		// Validation.buildDefaultValidatorFactory()实际上是用spi获取到classpath中的第一个ValidationProvider
+		// {@link javax.validation.Validation.GetValidationProviderListAction#loadProviders}
 		this(Validation.buildDefaultValidatorFactory());
 	}
 

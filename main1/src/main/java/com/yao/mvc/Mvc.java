@@ -5,15 +5,15 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
 import org.hibernate.validator.HibernateValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.MessageCodesResolver;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler;
@@ -71,6 +71,18 @@ public class Mvc {
 
 		// DispatchServlet是一个Servlet，并不是SpringContext，只是ServletContext中包含了一个SpringContext
 		return new DispatcherServlet(ac);
+	}
+
+//	@Bean
+	public static MethodValidationPostProcessor methodValidationPostProcessor(Environment environment) {
+		LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
+		factoryBean.afterPropertiesSet();
+		MethodValidationPostProcessor processor = new MethodValidationPostProcessor();
+		boolean proxyTargetClass = environment.getProperty("spring.aop.proxy-target-class", Boolean.class, true);
+		processor.setProxyTargetClass(proxyTargetClass);
+		processor.setValidator(factoryBean);
+		processor.setValidatedAnnotationType(Controller.class);
+		return processor;
 	}
 
 	@Bean

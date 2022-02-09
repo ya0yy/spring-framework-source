@@ -1504,6 +1504,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 		// BeanFactory
 		// ResourceLoader
 		// 如果是以上几种类型就放入result中，然后会进入到下面的for循环
+		// 如果是web环境，还会有request response session
 		for (Map.Entry<Class<?>, Object> classObjectEntry : this.resolvableDependencies.entrySet()) {
 			Class<?> autowiringType = classObjectEntry.getKey();
 			if (autowiringType.isAssignableFrom(requiredType)) {

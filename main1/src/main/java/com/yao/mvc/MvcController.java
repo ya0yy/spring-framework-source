@@ -5,6 +5,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.ModelAttributeMethodProcessor;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 
@@ -38,6 +39,12 @@ public class MvcController extends AbstractController {
 		return null;
 	}
 
+	/**
+	 * 参数中的@Valid校验是由spring mvc的校验器进行校验的，当classpath中存在有java的Valid的spi时，校验器就会生效，所以只要引入了hibernate的
+	 * 依赖（hibernate中有Valid的spi文件）,校验器就会自动生效
+	 * {@link ModelAttributeMethodProcessor#validateIfApplicable(org.springframework.web.bind.WebDataBinder, org.springframework.core.MethodParameter)}
+	 * 如果需要校验直接参数时，需要将MethodValidationPostProcessor引入带spring容器中（spring boot中好像已经将该postProcess初始引入到容器中了）
+	 */
 	@PostMapping("/test.do")
 	public String hello(@Valid User user, @ModelAttribute(name = "nickname") String nickname) {
 		return user  + "======" + nickname;

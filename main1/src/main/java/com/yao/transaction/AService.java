@@ -14,19 +14,25 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AService {
 
+	public AService() {
+		System.out.println();
+	}
+
 	@Autowired
 	AMapper a;
 
 	@Autowired
 	BService b;
+	@Autowired
+	AService aService;
 
 	@Transactional
 	public void insert() {
 		System.out.println(this.getClass());
 		a.insert();
 		try {
-//			((AService) AopContext.currentProxy()).insert0();
-			insert0();
+			((AService) AopContext.currentProxy()).insert0();
+//			insert0();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -17,9 +17,4 @@ public class AsyncB {
 
 	@Autowired
 	AsyncC asyncC;
-
-	@Async
-	public String hello() {
-		return "d hello";
-	}
 }

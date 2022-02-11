@@ -18,6 +18,8 @@ package org.springframework.scheduling.annotation;
 
 import java.lang.annotation.Annotation;
 
+import org.springframework.aop.Advisor;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,6 +56,19 @@ public class ProxyAsyncConfiguration extends AbstractAsyncConfiguration {
 		bpp.setProxyTargetClass(this.enableAsync.getBoolean("proxyTargetClass"));
 		bpp.setOrder(this.enableAsync.<Integer>getNumber("order"));
 		return bpp;
+	}
+
+	/**
+	 * 如果说这里直接将Advisor放到容器中，并开启自动代理（@EnableAspectJAutoProxy），那么就不存在aop的循环依赖问题了，详情见
+	 * org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory#doCreateBean(java.lang.String, org.springframework.beans.factory.support.RootBeanDefinition, java.lang.Object[])
+	 * 情况二
+	 */
+//	@Bean
+	public Advisor asyncAdvisor0(BeanFactory beanFactory) {
+		AsyncAnnotationAdvisor advisor = new AsyncAnnotationAdvisor(this.executor, this.exceptionHandler);
+		advisor.setAsyncAnnotationType(Async.class);
+		advisor.setBeanFactory(beanFactory);
+		return advisor;
 	}
 
 }

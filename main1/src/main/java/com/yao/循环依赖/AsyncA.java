@@ -18,4 +18,9 @@ public class AsyncA {
 	@Autowired
 	AsyncB asyncB;
 
+	@Async
+	public String hello() {
+		return "d hello";
+	}
+
 }

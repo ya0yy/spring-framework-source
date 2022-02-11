@@ -1909,7 +1909,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 					beanName, "Invocation of init method failed", ex);
 		}
 		if (mbd == null || !mbd.isSynthetic()) {
-			// 这行代码会生成aop的代理对象
+			// 第八次后置处理器postProcessAfterInitialization，这行代码会生成aop的代理对象
 			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
 		}
 

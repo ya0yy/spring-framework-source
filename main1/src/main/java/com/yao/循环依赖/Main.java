@@ -2,6 +2,7 @@ package com.yao.循环依赖;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
@@ -15,7 +16,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Main.class);
-		D d = context.getBean(D.class);
-//		d.sayHello();
+		AsyncA a = context.getBean(AsyncA.class);
+		System.out.println(a.hello());
 	}
 }

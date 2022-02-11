@@ -85,6 +85,7 @@ public class BeanFactoryAdvisorRetrievalHelper {
 		// 遍历所有通知
 		for (String name : advisorNames) {
 			if (isEligibleBean(name)) {
+				// 如果该advisor正在创建则会忽略advisors
 				if (this.beanFactory.isCurrentlyInCreation(name)) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Skipping currently created advisor '" + name + "'");

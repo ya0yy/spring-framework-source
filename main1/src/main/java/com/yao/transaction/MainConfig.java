@@ -25,7 +25,6 @@ public class MainConfig {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(MainConfig.class);
 		AService itemService = ac.getBean(AService.class);
-		BService orderService = ac.getBean(BService.class);
 		itemService.insert();
 	}
 

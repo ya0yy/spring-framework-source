@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -56,6 +57,9 @@ public class A {
 	@Autowired
 //			@Qualifier("b1")
 	public Map<String, ? extends D> map;
+
+	@Autowired
+	public List<D> list;
 
 	/**
 	 * Optional根据范型注入bean

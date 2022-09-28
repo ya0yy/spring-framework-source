@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * 2020-02-24 00:18
@@ -46,7 +47,7 @@ public class MvcController extends AbstractController {
 	 * 如果需要校验直接参数时，需要将MethodValidationPostProcessor引入带spring容器中（spring boot中好像已经将该postProcess初始引入到容器中了）
 	 */
 	@PostMapping("/test.do")
-	public String hello(@Valid User user, @ModelAttribute(name = "nickname") String nickname) {
+	public String hello(/*@Valid*/ User user, @ModelAttribute(name = "nickname") String nickname, @RequestParam(required = false) List<String> list) {
 		return user  + "======" + nickname;
 	}
 
@@ -87,6 +88,10 @@ public class MvcController extends AbstractController {
 	}
 
 	public static class User {
+		public User() {
+			System.out.println();
+		}
+
 		@NotNull(message = "name不能为null")
 		private String name;
 		private String nickname;

@@ -15,6 +15,7 @@ import org.springframework.context.annotation.Configuration;
 public class App {
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext ac = new AnnotationConfigApplicationContext(App.class);
+		AllArgsBean bean = ac.getBean(AllArgsBean.class);
 	}
 
 	@Bean

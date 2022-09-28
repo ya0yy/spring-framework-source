@@ -23,8 +23,8 @@ public class AService {
 
 	@Autowired
 	BService b;
-	@Autowired
-	AService aService;
+//	@Autowired
+//	AService aService;
 
 	@Transactional
 	public void insert() {

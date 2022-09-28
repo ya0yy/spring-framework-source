@@ -5,7 +5,7 @@ plugins {
 group 'org.springframework'
 version '5.2.0.BUILD-SNAPSHOT'
 
-sourceCompatibility = 1.8
+//sourceCompatibility = 1.8
 
 repositories {
     mavenCentral()

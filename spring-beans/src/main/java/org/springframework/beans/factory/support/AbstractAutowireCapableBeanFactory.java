@@ -413,7 +413,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// ApplicationContextAwareProcessor 完成一些Aware接口的值注入
 		// ConfigurationClassPostProcessor.ImportAwareBeanPostProcessor
 		// PostProcessorRegistrationDelegate.BeanPostProcessorChecker 直接return参数bean
-		// CommonAnnotationBeanPostProcessor 调用initMethod
+		// InitDestroyAnnotationBeanPostProcessor 调用initMethod
 		// AutowiredAnnotationBeanPostProcessor 直接return参数bean
 		// ApplicationListenerDetector 直接return参数bean
 		Object result = existingBean;
